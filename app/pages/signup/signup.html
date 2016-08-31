@@ -1,0 +1,19 @@
+<ion-navbar *navbar>
+  <ion-title>
+    Register
+  </ion-title>
+</ion-navbar>
+
+<ion-content class="signup" padding>
+  <ion-list>
+      <ion-item>
+          <ion-label floating>Username</ion-label>
+          <ion-input [(ngModel)] = "newcreds.name" type="text"></ion-input>
+      </ion-item>
+      <ion-item>
+          <ion-label floating>Password</ion-label>
+          <ion-input [(ngModel)] = "newcreds.password" type="password"></ion-input>
+      </ion-item>
+  </ion-list>
+  <button (click)="register(newcreds)">Register</button>
+</ion-content>
