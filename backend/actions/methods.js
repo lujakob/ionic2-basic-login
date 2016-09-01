@@ -5,6 +5,7 @@ var config = require('../config/database');
 
 var functions = {
   authenticate: function(req, res) {
+    console.log(req.body);
     User.findOne({
       name: req.body.name
     }, function(err, user){
@@ -15,8 +16,8 @@ var functions = {
       } else {
         user.comparePassword(req.body.password, function(err, isMatch){
           if(isMatch && !err) {
-            var token = jwt.encode(user, config.secret);
-            res.json({success: true, token: token});
+            var token = jwt.encode({exp:(Date.now() + 86400), user:user}, config.secret);
+            res.json({success: true, id_token: token});
           } else {
             return res.status(403).send({success: false, msg: 'Authenticaton failed, wrong password.'});
           }
@@ -25,6 +26,7 @@ var functions = {
     })
   },
   addNew: function(req, res){
+    console.log(req.body);
     if((!req.body.name) || (!req.body.password)){
       console.log(req.body.name);
       console.log(req.body.password);
@@ -45,7 +47,8 @@ var functions = {
         }
 
         else {
-          res.json({success:true, msg:'Successfully saved'});
+          var token = jwt.encode(newUser, config.secret);
+          res.json({success:true, msg:'Successfully saved', id_token: token});
         }
       })
     }
@@ -55,7 +58,7 @@ var functions = {
       var token = req.headers.authorization.split(' ')[1];
       var decodedtoken = jwt.decode(token, config.secret);
       console.log(decodedtoken);
-      return res.json({success: true, msg: 'hello ' + decodedtoken.name, userName: decodedtoken.name});
+      return res.json({success: true, msg: 'hello ' + decodedtoken.user.name, userName: decodedtoken.user.name});
     }
     else {
       return res.json({success:false, msg: 'No header'});

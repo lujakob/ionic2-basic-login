@@ -1,4 +1,5 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, ViewChild, provide} from '@angular/core';
+import { Http } from '@angular/http';
 import {ionicBootstrap, Platform, MenuController, Nav, AlertController} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {HomePage} from './pages/home/home';
@@ -7,7 +8,9 @@ import {UserPage} from './pages/user/user';
 import {SignupPage} from './pages/signup/signup';
 import {HelloIonicPage} from './pages/hello-ionic/hello-ionic';
 import {ListPage} from './pages/list/list';
+import {TabsPage} from './pages/tabs/tabs';
 import {AuthService} from './services/authservice';
+import {AuthHttp, AuthConfig} from 'angular2-jwt';
 
 
 @Component({
@@ -17,7 +20,7 @@ class MyApp {
   @ViewChild(Nav) nav: Nav;
 
   // make HelloIonicPage the root (or first) page
-  rootPage: any = HomePage;
+  rootPage: any;
   pages: Array<{title: string, component: any}>;
 
   constructor(
@@ -26,17 +29,8 @@ class MyApp {
     public service: AuthService,
     public alertController: AlertController
   ) {
+    this.rootPage = TabsPage;
     this.initializeApp();
-
-    // set our app's pages
-    this.pages = [
-      { title: 'Home', component: HomePage},
-      { title: 'Login', component: LoginPage},
-      { title: 'User', component: UserPage},
-      { title: 'Signup', component: SignupPage},
-      { title: 'Hello Ionic', component: HelloIonicPage },
-      { title: 'My First List', component: ListPage }
-    ];
   }
 
   initializeApp() {
@@ -56,4 +50,12 @@ class MyApp {
 
 }
 
-ionicBootstrap(MyApp, [AuthService]);
+ionicBootstrap(MyApp, [
+  AuthService,
+  provide(AuthHttp, {
+    useFactory: (http) => {
+      return new AuthHttp(new AuthConfig, http);
+    },
+    deps: [Http]
+  })
+]);
