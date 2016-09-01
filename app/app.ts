@@ -1,15 +1,9 @@
 import {Component, ViewChild, provide} from '@angular/core';
 import { Http } from '@angular/http';
-import {ionicBootstrap, Platform, MenuController, Nav, AlertController} from 'ionic-angular';
+import {ionicBootstrap, Platform, MenuController, Nav} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
-import {HomePage} from './pages/home/home';
-import {LoginPage} from './pages/login/login';
-import {UserPage} from './pages/user/user';
-import {SignupPage} from './pages/signup/signup';
-import {HelloIonicPage} from './pages/hello-ionic/hello-ionic';
-import {ListPage} from './pages/list/list';
 import {TabsPage} from './pages/tabs/tabs';
-import {AuthService} from './services/authservice';
+
 import {AuthHttp, AuthConfig} from 'angular2-jwt';
 
 
@@ -25,9 +19,7 @@ class MyApp {
 
   constructor(
     public platform: Platform,
-    public menu: MenuController,
-    public service: AuthService,
-    public alertController: AlertController
+    public menu: MenuController
   ) {
     this.rootPage = TabsPage;
     this.initializeApp();
@@ -51,7 +43,6 @@ class MyApp {
 }
 
 ionicBootstrap(MyApp, [
-  AuthService,
   provide(AuthHttp, {
     useFactory: (http) => {
       return new AuthHttp(new AuthConfig, http);
