@@ -5,21 +5,20 @@ var config = require('../config/database');
 
 var functions = {
   authenticate: function(req, res) {
-    console.log(req.body);
     User.findOne({
       name: req.body.name
     }, function(err, user){
       console.log(user);
       if (err) throw err;
       if(!user){
-        return res.status(403).send({success: false, msg: 'Authenticaton failed, user not found.'});
+        return res.status(403).send({success: false, msg: 'Authenticaton failed: user not found.'});
       } else {
         user.comparePassword(req.body.password, function(err, isMatch){
           if(isMatch && !err) {
             var token = jwt.encode({exp:(Date.now() + 86400), user:user}, config.secret);
             res.json({success: true, id_token: token});
           } else {
-            return res.status(403).send({success: false, msg: 'Authenticaton failed, wrong password.'});
+            return res.status(403).send({success: false, msg: 'Authenticaton failed: wrong password.'});
           }
         })
       }
