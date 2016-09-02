@@ -23,10 +23,10 @@ export class UserPage {
     
     getinfo() {
         this.service.getinfo().then(data => {
-            if(data.success) {
+            if(data.username) {
                 let alert = this.alertController.create({
-                    title: data.success,
-                    subTitle: data.msg,
+                    title: "Hello, " + data.username,
+                    subTitle: "Your email is: " + data.email,
                     buttons: ['OK']
                 });
                 alert.present();

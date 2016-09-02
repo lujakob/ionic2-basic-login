@@ -10,19 +10,19 @@ export class AuthService {
         this.AuthToken = null;
     }
 
-    storeUserCredentials(token) {
-        window.localStorage.setItem('raja', token);
-        this.useCredentials(token);
+    storeUserCredentials(userdata) {
+        window.localStorage.setItem('userdata', JSON.stringify(userdata));
+        this.useCredentials(userdata);
 
     }
 
-    useCredentials(token) {
-        this.isLoggedin = true;
-        this.AuthToken = token;
+    useCredentials(userdata) {
+        this.isLoggedin = !!true;
+        this.AuthToken = userdata;
     }
 
     loadUserCredentials() {
-        var token = window.localStorage.getItem('raja');
+        var token = JSON.parse(window.localStorage.getItem('userdata'));
         this.useCredentials(token);
     }
 
@@ -33,14 +33,19 @@ export class AuthService {
     }
 
     authenticate(user) {
-        var creds = "name=" + user.name + "&password=" + user.password;
+        var creds = btoa(user.name + ":" + user.password);
         var headers = new Headers();
-        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        // headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        headers.append('Authorization', ' Basic ' + creds);
 
         return new Promise(resolve => {
-            this.http.post('http://localhost:3333/authenticate', creds, {headers: headers}).subscribe(data => {
-                if(data.json().success){
-                    this.storeUserCredentials(data.json().token);
+            this.http.get('http://localhost:8080/me', {headers: headers}).subscribe(data => {
+                if(data.json()){
+                    this.storeUserCredentials({
+                        "username": user.name,
+                        "password": user.password,
+                        "email": data.json().email
+                    });
                     resolve(true);
                 }
                 else
@@ -72,13 +77,14 @@ export class AuthService {
         return new Promise(resolve => {
             var headers = new Headers();
             this.loadUserCredentials();
-            headers.append('Authorization', 'Bearer ' + this.AuthToken);
-            this.http.get('http://localhost:3333/getinfo', {headers: headers}).subscribe(data => {
-                if(data.json().success)
-                    resolve(data.json());
-                else
-                    resolve(false);
-            });
+            resolve(this.AuthToken);
+            // headers.append('Authorization', 'Bearer ' + this.AuthToken);
+            // this.http.get('http://localhost:3333/getinfo', {headers: headers}).subscribe(data => {
+            //     if(data.json().success)
+            //         resolve(data.json());
+            //     else
+            //         resolve(false);
+            // });
         })
     }
 
