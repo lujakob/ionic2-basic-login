@@ -2,22 +2,23 @@ import {Component, ViewChild, provide} from '@angular/core';
 import { Http } from '@angular/http';
 import {ionicBootstrap, Platform, MenuController, Nav, AlertController} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
-import {HomePage} from './pages/home/home';
+import {ProfilePage} from './pages/profile/profile';
 import {LoginPage} from './pages/login/login';
 import {UserPage} from './pages/user/user';
 import {SignupPage} from './pages/signup/signup';
 import {HelloIonicPage} from './pages/hello-ionic/hello-ionic';
 import {ListPage} from './pages/list/list';
 import {TabsPage} from './pages/tabs/tabs';
-import {AuthService} from './services/authservice';
 import {AuthHttp, AuthConfig} from 'angular2-jwt';
+
+import { AuthService } from './services/auth/auth';
 
 
 @Component({
   templateUrl: 'build/app.html'
 })
-class MyApp {
-  @ViewChild(Nav) nav: Nav;
+export class MyApp {
+  @ViewChild('myNav') nav: Nav;
 
   // make HelloIonicPage the root (or first) page
   rootPage: any;
@@ -29,7 +30,7 @@ class MyApp {
     public service: AuthService,
     public alertController: AlertController
   ) {
-    this.rootPage = TabsPage;
+    this.initializeAuthGuard();
     this.initializeApp();
   }
 
@@ -41,6 +42,14 @@ class MyApp {
     });
   }
 
+  initializeAuthGuard() {
+    if(this.service.authenticated()) {
+      this.rootPage = TabsPage;
+    } else {
+      this.rootPage = ProfilePage;
+    }
+
+  }
   openPage(page) {
     // close the menu when clicking a link from the menu
     this.menu.close();

@@ -1,12 +1,15 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { App, NavController } from 'ionic-angular';
 
-import {Storage, LocalStorage} from 'ionic-angular';
+import {Storage, LocalStorage, Nav} from 'ionic-angular';
 import {Http, Headers} from '@angular/http';
 import {FORM_DIRECTIVES} from '@angular/forms';
 import {JwtHelper} from 'angular2-jwt';
 import {AuthService} from '../../services/auth/auth';
 import 'rxjs/add/operator/map'
+import {TabsPage} from "../tabs/tabs";
+import {HomePage} from "../home/home";
+import { MyApp } from '../../app';
 
 @Component({
   templateUrl: 'build/pages/profile/profile.html',
@@ -26,7 +29,7 @@ export class ProfilePage {
   private local:Storage = new Storage(LocalStorage);
   private userName:string;
 
-  constructor(private http:Http, private auth:AuthService) {
+  constructor(private http:Http, private auth:AuthService, private nav: NavController, private app: App) {
     this.local.get('profile').then(profile => {
       this.userName = JSON.parse(profile);
     }).catch(error => {
@@ -38,15 +41,6 @@ export class ProfilePage {
 
   login(credentials) {
     console.log(credentials);
-    // this.http.post(this.LOGIN_URL, JSON.stringify(credentials), { headers: this.contentHeader })
-    //
-    //   .subscribe(
-    //     data => {
-    //       console.log(data);
-    //       this.authSuccess(data.token)
-    //     },
-    //     err => this.error = err
-    //   );
 
     var creds = "name=" + credentials.name + "&password=" + credentials.password;
     var headers = new Headers();
@@ -77,11 +71,10 @@ export class ProfilePage {
     this.local.remove('id_token');
     this.local.remove('profile');
     this.userName = null;
+    this.app.getRootNav().setRoot(ProfilePage);
   }
-
-
+  
   authSuccess(data) {
-    console.log(data);
     var id_token = data.id_token;
 
     if(!!id_token) {
@@ -90,8 +83,10 @@ export class ProfilePage {
       this.local.set('id_token', id_token);
       this.local.set('profile', JSON.stringify(this.userName));
 
-      console.log("this.user", this.userName);
-      console.log("this.auth.authenticated()", this.auth.authenticated());
+      // console.log("this.user", this.userName);
+      // console.log("this.auth.authenticated()", this.auth.authenticated());
+
+      this.nav.setRoot(TabsPage);
     }
 
   }
