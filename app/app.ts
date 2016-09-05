@@ -1,21 +1,17 @@
-import {Component, ViewChild, provide} from '@angular/core';
+import {Component, ViewChild, provide, PLATFORM_DIRECTIVES} from '@angular/core';
 import { Http } from '@angular/http';
 import {ionicBootstrap, Platform, MenuController, Nav, AlertController} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {ProfilePage} from './pages/profile/profile';
-import {LoginPage} from './pages/login/login';
-import {UserPage} from './pages/user/user';
-import {SignupPage} from './pages/signup/signup';
-import {HelloIonicPage} from './pages/hello-ionic/hello-ionic';
-import {ListPage} from './pages/list/list';
 import {TabsPage} from './pages/tabs/tabs';
 import {AuthHttp, AuthConfig} from 'angular2-jwt';
+import { ClientSelectComponent } from './components/client-select.component';
 
 import { AuthService } from './services/auth/auth';
 
-
 @Component({
-  templateUrl: 'build/app.html'
+  templateUrl: 'build/app.html',
+  directives: [ClientSelectComponent]
 })
 export class MyApp {
   @ViewChild('myNav') nav: Nav;
@@ -27,8 +23,7 @@ export class MyApp {
   constructor(
     public platform: Platform,
     public menu: MenuController,
-    public service: AuthService,
-    public alertController: AlertController
+    public service: AuthService
   ) {
     this.initializeAuthGuard();
     this.initializeApp();
@@ -56,7 +51,6 @@ export class MyApp {
     // navigate to the new page if it is not the current page
     this.nav.setRoot(page.component);
   }
-
 }
 
 ionicBootstrap(MyApp, [
@@ -66,5 +60,7 @@ ionicBootstrap(MyApp, [
       return new AuthHttp(new AuthConfig, http);
     },
     deps: [Http]
-  })
+  }),
+  provide(PLATFORM_DIRECTIVES, {useValue: [ClientSelectComponent], multi: true})
 ]);
+

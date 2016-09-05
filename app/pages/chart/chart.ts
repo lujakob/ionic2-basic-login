@@ -5,17 +5,17 @@ import { ChartService } from './chart.service';
 
 
 @Component({
-  templateUrl: 'build/pages/hello-ionic/hello-ionic.html',
+  templateUrl: 'build/pages/chart/chart.html',
   directives: [CHART_DIRECTIVES],
     providers: [ChartService],
     styles: [`
       chart {
         display: block;
         width: 100%
-      }
+      } 
     `]
 })
-export class HelloIonicPage implements AfterViewInit{
+export class ChartPage implements AfterViewInit{
   private chartData: any[];
   private errorMessage: any;
   options: HighchartsOptions;
@@ -36,10 +36,25 @@ export class HelloIonicPage implements AfterViewInit{
 
     ngAfterViewInit() {
         // this.chart.reflow();
-        // console.log("reflow after view");
-
-        this.initChart();
     }
+    ionViewDidEnter() {
+      this.initChart();
+
+    }
+    ionViewDidLeave() {
+      this.chart.destroy();
+    }
+
+    saveInstance(chartInstance) {
+      this.chart = chartInstance;
+      console.log(this.chart)
+    }
+    // saveInstance(chartInstance) {
+    //   // this.chart = chartInstance;
+    //   // this.chart.reflow();
+    //   // console.log("reflow");
+    // }
+
     initChart() {
 
         this.chartService.getChartData()
@@ -98,15 +113,10 @@ export class HelloIonicPage implements AfterViewInit{
                     };
 
                 },
-                error =>  this.errorMessage = <any>error);
+                error =>  this.errorMessage = <any>error
+            );
 
     }
-    saveInstance(chartInstance) {
-        // this.chart = chartInstance;
-        // this.chart.reflow();
-        // console.log("reflow");
-    }
-
 }
 
 
