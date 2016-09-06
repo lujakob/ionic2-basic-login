@@ -1,0 +1,13 @@
+<ion-header>
+	<ion-navbar>
+		<ion-title>
+			Films
+			<client-select></client-select>
+		</ion-title>
+	</ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+	<film-selection [count]="filmsCount$ | async"></film-selection>
+</ion-content>

@@ -1,11 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { AlertController } from 'ionic-angular';
 
-import { Store } from 'redux';
-import { AppStore } from '../app-store';
-import { AppState } from '../app-state';
-import * as ClientActions from '../actions/actions-creators';
-
 @Component({
   selector: 'client-select',
   template: '<ion-icon name="person-add" (click)="clientSelect()" class="toolbar-client"></ion-icon>',
@@ -14,12 +9,12 @@ import * as ClientActions from '../actions/actions-creators';
 export class ClientSelectComponent {
   private client: number = 0;
   constructor(
-    public alertCtrl: AlertController,
-    @Inject(AppStore) private store: Store<AppState>
+    public alertCtrl: AlertController
   ) {}
 
   clientSelect() {
-    let selectedClient = this.store.getState().clientId;
+    // let selectedClient = this.store.getState().clientId;
+    let selectedClient = 0;
     let alertInputs = [
       {
         type: 'radio',
@@ -54,7 +49,7 @@ export class ClientSelectComponent {
     alert.addButton({
       text: 'OK',
       handler: data => {
-        this.store.dispatch(ClientActions.setClient(parseInt(data)));
+        //this.store.dispatch(ClientActions.setClient(parseInt(data)));
         this.client = data;
       }
     });

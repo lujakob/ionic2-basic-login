@@ -3,6 +3,7 @@ import {HomePage} from '../home/home';
 import {QuotesPage} from '../quotes/quotes';
 import {ProfilePage} from '../profile/profile';
 import {ChartPage} from '../chart/chart';
+import {FilmsPage} from '../films/films';
 
 @Component({
   templateUrl: 'build/pages/tabs/tabs.html'
@@ -12,6 +13,7 @@ export class TabsPage {
   private quotesPage: any;
   private profilePage: any;
   private chartPage: any;
+  private filmsPage: any;
 
   constructor() {
     // // this tells the tabs component which Pages
@@ -20,5 +22,6 @@ export class TabsPage {
     this.quotesPage = QuotesPage;
     this.profilePage = ProfilePage;
     this.chartPage = ChartPage;
+    this.filmsPage = FilmsPage;
   }
 }

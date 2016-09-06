@@ -1,35 +1,22 @@
 import {Component, ViewChild, provide, PLATFORM_DIRECTIVES} from '@angular/core';
 import { Http } from '@angular/http';
-import {ionicBootstrap, Platform, MenuController, Nav, AlertController} from 'ionic-angular';
+import {ionicBootstrap, Platform, MenuController, Nav} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {ProfilePage} from './pages/profile/profile';
 import {TabsPage} from './pages/tabs/tabs';
 import {AuthHttp, AuthConfig} from 'angular2-jwt';
 import { ClientSelectComponent } from './components/client-select.component';
 
-import thunkMiddleware from 'redux-thunk';
-import {
-  createStore,
-  applyMiddleware,
-  Store,
-  StoreEnhancer
-} from 'redux';
-
-import { clientReducer } from './reducers/reducer';
-import { AppState } from './app-state';
-import { AppStore } from './app-store';
+import { AppStore, createAppStoreFactoryWithOptions } from "angular2-redux";
+import reducers from "./reducers/reducer";
+import {FilmActions} from "./actions/film-actions";
 
 import { AuthService } from './services/auth/auth';
 
-let devtools: StoreEnhancer<AppState> = window['devToolsExtension'] ? window['devToolsExtension']() : f => f;
-
-let store: Store<AppState> = createStore<AppState>(
-  clientReducer,
-  devtools,
-  applyMiddleware(
-    thunkMiddleware
-  )
-);
+const appStoreFactory = createAppStoreFactoryWithOptions({
+  reducers,
+  debug:true
+});
 
 @Component({
   templateUrl: 'build/app.html',
@@ -77,6 +64,8 @@ export class MyApp {
 
 ionicBootstrap(MyApp, [
   AuthService,
+  provide(AppStore, { useFactory: appStoreFactory }),
+  FilmActions,
   provide(AuthHttp, {
     useFactory: (http) => {
       return new AuthHttp(new AuthConfig, http);
@@ -84,6 +73,5 @@ ionicBootstrap(MyApp, [
     deps: [Http]
   }),
   provide(PLATFORM_DIRECTIVES, {useValue: [ClientSelectComponent], multi: true}),
-  provide(AppStore, {useValue: store})
 ]);
 
