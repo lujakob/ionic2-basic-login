@@ -7,8 +7,10 @@ import {TabsPage} from './pages/tabs/tabs';
 import {AuthHttp, AuthConfig} from 'angular2-jwt';
 import { ClientSelectComponent } from './components/client-select.component';
 
+import thunkMiddleware from 'redux-thunk';
 import {
   createStore,
+  applyMiddleware,
   Store,
   StoreEnhancer
 } from 'redux';
@@ -23,7 +25,10 @@ let devtools: StoreEnhancer<AppState> = window['devToolsExtension'] ? window['de
 
 let store: Store<AppState> = createStore<AppState>(
   clientReducer,
-  devtools
+  devtools,
+  applyMiddleware(
+    thunkMiddleware
+  )
 );
 
 @Component({

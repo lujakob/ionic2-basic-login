@@ -14,4 +14,6 @@ This is a basic ionic2 implementation with a simple node express server to signu
 ( see backend/actions/methods.js file for REST Api endpoints and use Postman to test )
 
 ## Changelog
-This is a JsonWebToken based authentication. Login/Logout is being showed on the same page, depending on auth status. 
+This is a JsonWebToken based authentication. Login/Logout is being showed on the same page, depending on auth status.
+
+I tried to implement redux-thunk. Not working though...
