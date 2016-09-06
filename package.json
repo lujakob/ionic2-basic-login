@@ -9,6 +9,7 @@
     "@angular/platform-browser-dynamic": "2.0.0-rc.4",
     "angular2-highcharts": "^0.2.1",
     "angular2-jwt": "^0.1.19",
+    "angular2-redux": "^3.1.1",
     "bcrypt": "^0.8.7",
     "body-parser": "^1.15.2",
     "cors": "^2.8.0",
@@ -23,6 +24,7 @@
     "morgan": "^1.7.0",
     "passport": "^0.3.2",
     "passport-jwt": "^2.1.0",
+    "redux": "^3.6.0",
     "reflect-metadata": "0.1.8",
     "rxjs": "5.0.0-beta.6",
     "zone.js": "0.6.12"

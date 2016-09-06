@@ -7,7 +7,24 @@ import {TabsPage} from './pages/tabs/tabs';
 import {AuthHttp, AuthConfig} from 'angular2-jwt';
 import { ClientSelectComponent } from './components/client-select.component';
 
+import {
+  createStore,
+  Store,
+  StoreEnhancer
+} from 'redux';
+
+import { clientReducer } from './reducers/reducer';
+import { AppState } from './app-state';
+import { AppStore } from './app-store';
+
 import { AuthService } from './services/auth/auth';
+
+let devtools: StoreEnhancer<AppState> = window['devToolsExtension'] ? window['devToolsExtension']() : f => f;
+
+let store: Store<AppState> = createStore<AppState>(
+  clientReducer,
+  devtools
+);
 
 @Component({
   templateUrl: 'build/app.html',
@@ -61,6 +78,7 @@ ionicBootstrap(MyApp, [
     },
     deps: [Http]
   }),
-  provide(PLATFORM_DIRECTIVES, {useValue: [ClientSelectComponent], multi: true})
+  provide(PLATFORM_DIRECTIVES, {useValue: [ClientSelectComponent], multi: true}),
+  provide(AppStore, {useValue: store})
 ]);
 

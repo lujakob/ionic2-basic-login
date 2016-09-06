@@ -21,102 +21,87 @@ export class ChartPage implements AfterViewInit{
   options: HighchartsOptions;
   chart : HighchartsChartObject;
   constructor(private chartService: ChartService) {
-
-      // this.options = {
-      //     title : { text : 'simple chart' },
-      //     series: [{
-      //         data: [29.9, 71.5, 106.4, 129.2],
-      //     }]
-      // };
-      //setTimeout(() => this.chart.reflow(), 5000);
-      //setInterval(() => this.chart.series[0].addPoint(Math.random() * 10), 1000);
         this.chartData = [29.9, 71.5, 106.4, 129.2];
-
   }
 
-    ngAfterViewInit() {
-        // this.chart.reflow();
-    }
-    ionViewDidEnter() {
-      this.initChart();
+  ngAfterViewInit() {
+      // this.chart.reflow();
+  }
+  ionViewDidEnter() {
+    this.initChart();
 
-    }
-    ionViewDidLeave() {
-      this.chart.destroy();
-    }
+  }
+  ionViewDidLeave() {
+    this.chart.destroy();
+  }
 
-    saveInstance(chartInstance) {
-      this.chart = chartInstance;
-      console.log(this.chart)
-    }
-    // saveInstance(chartInstance) {
-    //   // this.chart = chartInstance;
-    //   // this.chart.reflow();
-    //   // console.log("reflow");
-    // }
+  saveInstance(chartInstance) {
+    this.chart = chartInstance;
+    // this.chart.reflow();
+    console.log(this.chart)
+  }
 
-    initChart() {
+  initChart() {
+      this.chartService.getChartData()
+          .subscribe(
+              (data) => {
+                  //console.log(data);
+                  this.options = {
+                      chart: {
+                          type: 'column',
+                          height: 400,
+                          backgroundColor: '#333',
+                          spacing: [10,20,0,10]
+                      },
+                      tooltip: {
+                          enabled: false
+                      },
+                      // title: {
+                      //     style:{"display": "none"}
+                      // },
+                      // subtitle: {
+                      //     style:{"display": "none"}
+                      // },
+                      // credits: {
+                      //     enabled: false
+                      // },
+                      xAxis: {
+                          visible:false,
+                          //categories: ['Africa', 'America', 'Asia', 'Europe', 'Oceania'],
+                          title: {
+                              text: null
+                          }
+                      },
+                      yAxis: {
+                          title: {
+                              text: null
+                          }
+                          //visible:false
+                      },
+                      legend: {
+                          enabled: false
+                      },
+                      // plotOptions: {
+                      //     column: {
+                      //         pointPadding: 0,
+                      //         borderWidth: 0,
+                      //         groupPadding:0
+                      //     },
+                      //     series: {
+                      //         pointWidth:20,
+                      //     }
+                      // },
+                      series: [{
+                          data: data,
+                          // data: [29.9, 71.5, 106.4, 129.2],
+                      }]
+                  };
 
-        this.chartService.getChartData()
-            .subscribe(
-                (data) => {
-                    //console.log(data);
-                    this.options = {
-                        chart: {
-                            type: 'column',
-                            height: 400,
-                            backgroundColor: '#333',
-                            spacing: [10,20,0,10]
-                        },
-                        tooltip: {
-                            enabled: false
-                        },
-                        // title: {
-                        //     style:{"display": "none"}
-                        // },
-                        // subtitle: {
-                        //     style:{"display": "none"}
-                        // },
-                        // credits: {
-                        //     enabled: false
-                        // },
-                        xAxis: {
-                            visible:false,
-                            //categories: ['Africa', 'America', 'Asia', 'Europe', 'Oceania'],
-                            title: {
-                                text: null
-                            }
-                        },
-                        yAxis: {
-                            title: {
-                                text: null
-                            }
-                            //visible:false
-                        },
-                        legend: {
-                            enabled: false
-                        },
-                        // plotOptions: {
-                        //     column: {
-                        //         pointPadding: 0,
-                        //         borderWidth: 0,
-                        //         groupPadding:0
-                        //     },
-                        //     series: {
-                        //         pointWidth:20,
-                        //     }
-                        // },
-                        series: [{
-                            data: data,
-                            // data: [29.9, 71.5, 106.4, 129.2],
-                        }]
-                    };
+              },
+              error =>  this.errorMessage = <any>error
+          );
 
-                },
-                error =>  this.errorMessage = <any>error
-            );
-
-    }
+  }
 }
 
 
