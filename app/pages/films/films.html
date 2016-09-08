@@ -9,5 +9,8 @@
 
 
 <ion-content padding>
-	<film-selection [count]="filmsCount$ | async"></film-selection>
+	<film-selection [count]="filmsCount$ | async" (current)="setCurrentFilm($event)"></film-selection>
+	<div [ngClass]="{'text-muted':isFetchingCurrentFilm,'text-primary':!isFetchingCurrentFilm}" style="margin-top:20px;">
+		<film [data]="currentFilm$ | async" [loading]="isFetchingCurrentFilm"></film>
+	</div>
 </ion-content>

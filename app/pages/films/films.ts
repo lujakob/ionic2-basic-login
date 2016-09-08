@@ -24,24 +24,21 @@ export class FilmsPage {
   private unsubscribeFromStore:()=>void;
 
   constructor(private _appStore:AppStore,
-              private _filmActions:FilmActions,
-              private navCtrl: NavController
-  ) {
+              private _filmActions:FilmActions) {
 
-    // this.filmsCount$ = 3;
     this.filmsCount$ = _appStore.select(filmsCountSelector);
-    //this.currentFilm$ = _appStore.select(currentFilmSelector);
+    this.currentFilm$ = _appStore.select(currentFilmSelector);
 
-    // _appStore.select(isFetchingFilmSelector).subscribe(isFetchingFilm => {
-    //   this.isFetchingCurrentFilm = isFetchingFilm;
-    // });
+    _appStore.select(isFetchingFilmSelector).subscribe(isFetchingFilm => {
+      this.isFetchingCurrentFilm = isFetchingFilm;
+    });
 
-    // _appStore.dispatch(_filmActions.fetchFilms());
+    _appStore.dispatch(_filmActions.fetchFilms());
   }
 
-  // setCurrentFilm(index) {
-  //   this._appStore.dispatch(this._filmActions.setCurrentFilm(index));
-  //   this._appStore.dispatch(this._filmActions.fetchFilm(index ));
-  // }
-
+  setCurrentFilm(index) {
+    console.log(index);
+    this._appStore.dispatch(this._filmActions.setCurrentFilm(index));
+    this._appStore.dispatch(this._filmActions.fetchFilm(index ));
+  }
 }

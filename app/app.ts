@@ -3,12 +3,13 @@ import { Http } from '@angular/http';
 import {ionicBootstrap, Platform, MenuController, Nav} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {ProfilePage} from './pages/profile/profile';
+import {FilmsPage} from './pages/films/films';
 import {TabsPage} from './pages/tabs/tabs';
 import {AuthHttp, AuthConfig} from 'angular2-jwt';
 import { ClientSelectComponent } from './components/client-select.component';
 
 import { AppStore, createAppStoreFactoryWithOptions } from "angular2-redux";
-import reducers from "./reducers/reducer";
+import reducers from "./reducers/app-reducer";
 import {FilmActions} from "./actions/film-actions";
 
 import { AuthService } from './services/auth/auth';
@@ -34,7 +35,9 @@ export class MyApp {
     public menu: MenuController,
     public service: AuthService
   ) {
-    this.initializeAuthGuard();
+    // this.initializeAuthGuard();
+    this.rootPage = FilmsPage;
+
     this.initializeApp();
   }
 
@@ -52,7 +55,6 @@ export class MyApp {
     } else {
       this.rootPage = ProfilePage;
     }
-
   }
   openPage(page) {
     // close the menu when clicking a link from the menu
