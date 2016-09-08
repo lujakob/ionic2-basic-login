@@ -21,7 +21,7 @@ export class FilmsPage {
   private currentFilm$ = null;
   private isFetchingCurrentFilm = false;
 
-  private unsubscribeFromStore:()=>void;
+  private unsubscribeFromStore:() => void;
 
   constructor(private _appStore:AppStore,
               private _filmActions:FilmActions) {
@@ -37,7 +37,6 @@ export class FilmsPage {
   }
 
   setCurrentFilm(index) {
-    console.log(index);
     this._appStore.dispatch(this._filmActions.setCurrentFilm(index));
     this._appStore.dispatch(this._filmActions.fetchFilm(index ));
   }
