@@ -13,9 +13,13 @@
 	<p>
 		Welcome to myBMG App. Here you can see wonderful things!
 	</p>
-	<button (click)="increment()"
-					class="btn btn-primary">
-		Set client
+	<button (click)="increment()" class="btn btn-primary">
+		increment
 	</button>
+	<button (click)="decrement()" class="btn btn-primary">
+		decrement
+	</button>
+
+	<p>Counter: {{ counter }}</p>
 	<p>This is the current client Id {{clientId}}</p>
 </ion-content>

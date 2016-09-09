@@ -11,6 +11,7 @@ import { ClientSelectComponent } from './components/client-select.component';
 import { AppStore, createAppStoreFactoryWithOptions } from "angular2-redux";
 import reducers from "./reducers/app-reducer";
 import {FilmActions} from "./actions/film-actions";
+import { CounterActions } from "./actions/counter-actions";
 
 import { AuthService } from './services/auth/auth';
 
@@ -35,9 +36,8 @@ export class MyApp {
     public menu: MenuController,
     public service: AuthService
   ) {
-    // this.initializeAuthGuard();
-    this.rootPage = FilmsPage;
 
+    this.initializeAuthGuard();
     this.initializeApp();
   }
 
@@ -68,12 +68,13 @@ ionicBootstrap(MyApp, [
   AuthService,
   provide(AppStore, { useFactory: appStoreFactory }),
   FilmActions,
+  CounterActions,
   provide(AuthHttp, {
     useFactory: (http) => {
       return new AuthHttp(new AuthConfig, http);
     },
     deps: [Http]
   }),
-  provide(PLATFORM_DIRECTIVES, {useValue: [ClientSelectComponent], multi: true}),
+  provide(PLATFORM_DIRECTIVES, {useValue: [ClientSelectComponent], multi: true})
 ]);
 
