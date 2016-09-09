@@ -1,5 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { AlertController } from 'ionic-angular';
+import { AppStore } from 'angular2-redux';
+import { selectedClientSelector } from '../reducers/select-clients-reducer';
+import { SelectClientsActions } from '../actions/select-clients-actions';
 
 @Component({
   selector: 'client-select',
@@ -9,12 +12,14 @@ import { AlertController } from 'ionic-angular';
 export class ClientSelectComponent {
   private client: number = 0;
   constructor(
-    public alertCtrl: AlertController
-  ) {}
+    public alertCtrl: AlertController,
+    private _appStore: AppStore,
+    private _selectClientsActions: SelectClientsActions) {
+  }
 
   clientSelect() {
     // let selectedClient = this.store.getState().clientId;
-    let selectedClient = 0;
+    let selectedClient = this._appStore.getState().selectClients;
     let alertInputs = [
       {
         type: 'radio',
@@ -50,7 +55,8 @@ export class ClientSelectComponent {
       text: 'OK',
       handler: data => {
         //this.store.dispatch(ClientActions.setClient(parseInt(data)));
-        this.client = data;
+        //this.client = data;
+        this._appStore.dispatch(this._selectClientsActions.selectClient(parseInt(data)));
       }
     });
     alert.present();

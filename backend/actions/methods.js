@@ -2,6 +2,7 @@ var User = require('../models/user');
 //var Session = require('../models/session');
 var jwt  = require('jwt-simple');
 var config = require('../config/database');
+var _ = require('lodash');
 
 var functions = {
   authenticate: function(req, res) {
@@ -62,6 +63,45 @@ var functions = {
     else {
       return res.json({success:false, msg: 'No header'});
     }
+  },
+  getStatements: function(req, res) {
+    var limit = 0,
+        offset = 0;
+
+    var params = req.query;
+    var clientId = parseInt(params.clientId);
+    var sortby = params.sortby && params.sortby.length > 0 ? params.sortby : 'title';
+    var data = require('../../www/data/statementsData.json');
+
+    // clientId filter
+    if (clientId > 0) {
+      data = _.filter(data, function(item) {
+        return item.clientId == clientId
+      });
+    }
+
+    // sorting by title/id
+    switch(sortby) {
+      case 'title':
+        data = _.sortBy(data, function(o) { return o.title; });
+        break;
+      case 'id':
+        data = _.sortBy(data, function(o) { return o.id; });
+        break;
+      default:
+        data = data;
+    }
+
+    // offset / limit
+    if (params.offset && parseInt(params.offset) > 0) {
+      offset = parseInt(params.offset);
+    }
+
+    if(limit > 0) {
+      data = data.slice(offset, (data.length > (offset + limit) ? offset + limit : data.length));
+    }
+
+    res.json(data);
   }
 
 };

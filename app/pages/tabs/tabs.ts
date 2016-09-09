@@ -1,6 +1,6 @@
 import {Component} from '@angular/core'
 import {HomePage} from '../home/home';
-import {QuotesPage} from '../quotes/quotes';
+import {StatementsPage} from '../statements/statements';
 import {ProfilePage} from '../profile/profile';
 import {ChartPage} from '../chart/chart';
 import {FilmsPage} from '../films/films';
@@ -10,7 +10,7 @@ import {FilmsPage} from '../films/films';
 })
 export class TabsPage {
   private homePage: any;
-  private quotesPage: any;
+  private statementsPage: any;
   private profilePage: any;
   private chartPage: any;
   private filmsPage: any;
@@ -19,7 +19,7 @@ export class TabsPage {
     // // this tells the tabs component which Pages
     // // should be each tab's root Page
     this.homePage = HomePage;
-    this.quotesPage = QuotesPage;
+    this.statementsPage = StatementsPage;
     this.profilePage = ProfilePage;
     this.chartPage = ChartPage;
     this.filmsPage = FilmsPage;

@@ -16,4 +16,13 @@ This is a basic ionic2 implementation with a simple node express server to signu
 ## Changelog
 This is a JsonWebToken based authentication. Login/Logout is being showed on the same page, depending on auth status.
 
-angular2-redux package, based upon the https://github.com/InfomediaLtd/angular2-redux-example working. Simple FilmsPage with a films selection and film details view.
+angular2-redux package, based upon the https://github.com/InfomediaLtd/angular2-redux-example working.
+
+Statements serve via node server. Statements page working, filter by client selector, ordered by title.
+
+http://localhost:3333/statements returns json array of statement items.
+
+http://localhost:3333/statements?clientId=1 => filters by clientId
+
+http://localhost:3333/statements?orderby=id|title => order by id or title
+

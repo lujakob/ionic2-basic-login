@@ -2,7 +2,8 @@ import { Component, Inject } from '@angular/core';
 
 import { AppStore } from "angular2-redux";
 import { CounterActions } from "../../actions/counter-actions";
-import { counterSelector }from "../../reducers/counter-reducer";
+import { counterSelector } from "../../reducers/counter-reducer";
+import { selectedClientSelector } from "../../reducers/select-clients-reducer";
 
 @Component({
   templateUrl: 'build/pages/home/home.html',
@@ -20,7 +21,15 @@ export class HomePage {
     //this.counter$ = _appStore.select(counterSelector);
 
     _appStore.select(counterSelector).subscribe(counter => {
+      console.log("subscribed counter", counter);
       this.counter = counter;
+    });
+
+    _appStore.select(selectedClientSelector).subscribe(clientId => {
+      this.clientId = clientId;
+    });
+    _appStore.subscribe(state => {
+      console.log("subscribe to state change", state);
     });
 
   }

@@ -3,15 +3,17 @@ import { Http } from '@angular/http';
 import {ionicBootstrap, Platform, MenuController, Nav} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {ProfilePage} from './pages/profile/profile';
-import {FilmsPage} from './pages/films/films';
+
 import {TabsPage} from './pages/tabs/tabs';
 import {AuthHttp, AuthConfig} from 'angular2-jwt';
 import { ClientSelectComponent } from './components/client-select.component';
 
 import { AppStore, createAppStoreFactoryWithOptions } from "angular2-redux";
 import reducers from "./reducers/app-reducer";
-import {FilmActions} from "./actions/film-actions";
+import { FilmActions } from "./actions/film-actions";
 import { CounterActions } from "./actions/counter-actions";
+import { StatementsActions } from "./actions/statements-actions";
+import { SelectClientsActions } from "./actions/select-clients-actions";
 
 import { AuthService } from './services/auth/auth';
 
@@ -67,8 +69,7 @@ export class MyApp {
 ionicBootstrap(MyApp, [
   AuthService,
   provide(AppStore, { useFactory: appStoreFactory }),
-  FilmActions,
-  CounterActions,
+  FilmActions,  CounterActions,  SelectClientsActions, StatementsActions,
   provide(AuthHttp, {
     useFactory: (http) => {
       return new AuthHttp(new AuthConfig, http);
