@@ -65,12 +65,15 @@ var functions = {
     }
   },
   getStatements: function(req, res) {
-    var limit = 0,
-        offset = 0;
+    var limit = 50,
+        offset = 0,
+        defaultSortby = 'id',
+        nextOffset,
+        total;
 
     var params = req.query;
     var clientId = parseInt(params.clientId);
-    var sortby = params.sortby && params.sortby.length > 0 ? params.sortby : 'title';
+    var sortby = params.sortby && params.sortby.length > 0 ? params.sortby : defaultSortby;
     var data = require('../../www/data/statementsData.json');
 
     // clientId filter
@@ -79,6 +82,8 @@ var functions = {
         return item.clientId == clientId
       });
     }
+
+    total = data.length;
 
     // sorting by title/id
     switch(sortby) {
@@ -97,11 +102,19 @@ var functions = {
       offset = parseInt(params.offset);
     }
 
+    nextOffset = data.length > limit + offset ? limit + offset : -1;
+
+
     if(limit > 0) {
       data = data.slice(offset, (data.length > (offset + limit) ? offset + limit : data.length));
     }
 
-    res.json(data);
+    // simulate network delay
+    setTimeout(function() {
+      res.json({data: data, nextOffset: nextOffset, total: total});
+    }, 500);
+
+
   }
 
 };

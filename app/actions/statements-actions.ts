@@ -7,15 +7,18 @@ const BASE_URL = "http://localhost:3333/statements";
 // const BASE_URL = "data/statementsData.json";
 
 type Types = "REQUEST_STATEMENTS" | "RECEIVE_STATEMENTS" |
+  "RECEIVE_STATEMENTS_ADD" |
   "REQUEST_STATEMENT" | "RECEIVE_STATEMENT" |
-  "RECEIVE_NUMBER_OF_STATEMENTS" | "CURRENT_STATEMENT";
+  "RECEIVE_NUMBER_OF_STATEMENTS" | "CURRENT_STATEMENT" | "SET_NEXT_OFFSET";
 export const StatementsActionTypes = {
   REQUEST_STATEMENTS: "REQUEST_STATEMENTS" as Types,
   RECEIVE_STATEMENTS: "RECEIVE_STATEMENTS" as Types,
+  RECEIVE_STATEMENTS_ADD: "RECEIVE_STATEMENTS_ADD" as Types,
   REQUEST_STATEMENT: "REQUEST_STATEMENT" as Types,
   RECEIVE_STATEMENT: "RECEIVE_STATEMENT" as Types,
   RECEIVE_NUMBER_OF_STATEMENTS: "RECEIVE_NUMBER_OF_STATEMENTS" as Types,
-  CURRENT_STATEMENT: "CURRENT_STATEMENT" as Types
+  CURRENT_STATEMENT: "CURRENT_STATEMENT" as Types,
+  SET_NEXT_OFFSET: "SET_NEXT_OFFSET" as Types
 };
 
 export interface StatementAction {
@@ -23,7 +26,8 @@ export interface StatementAction {
   count?;
   statements?;
   statement?;
-  currentIndex?;
+  currentIndex?,
+  nextOffset?;
 }
 
 @Injectable()
@@ -33,11 +37,10 @@ export class StatementsActions extends Actions {
     super(appStore);
   }
 
-  fetchStatements(clientId = 0) {
-    console.log("clientId", clientId);
+  fetchStatements(clientId = 0, offset = 0) {
     return (dispatch) => {
       dispatch(this.requestStatements());
-      let url = BASE_URL + (clientId > 0 ? '?clientId=' + clientId : '');
+      let url = BASE_URL + '?1=1' + (clientId > 0 ? '&clientId=' + clientId : '') + (offset > 0 ? '&offset=' + offset : '');
 
       this._http.get(url)
         .map(result => result.json())
@@ -48,12 +51,26 @@ export class StatementsActions extends Actions {
         //   return data;
         // })
         .map(data => {
-          dispatch(this.receiveStatements(data));
-          console.log("data.length", data.length);
-          dispatch(this.receiveNumberOfStatements(data.length));
+          dispatch(this.setNextOffset(data.nextOffset));
+          if(offset > 0) {
+            console.log("receiveStatementsAdd");
+            dispatch(this.receiveStatementsAdd(data.data));
+          } else {
+            console.log("receiveStatements");
+            dispatch(this.receiveStatements(data.data));
+          }
+
+          dispatch(this.receiveNumberOfStatements(data.total));
         })
         .subscribe();
     };
+  }
+
+  setNextOffset(nextOffset) {
+    return {
+      type: StatementsActionTypes.SET_NEXT_OFFSET,
+      nextOffset
+    }
   }
 
   fetchStatement(index) {
@@ -76,6 +93,13 @@ export class StatementsActions extends Actions {
   receiveStatements(statements) {
     return {
       type: StatementsActionTypes.RECEIVE_STATEMENTS,
+      statements
+    }
+  }
+
+  receiveStatementsAdd(statements) {
+    return {
+      type: StatementsActionTypes.RECEIVE_STATEMENTS_ADD,
       statements
     }
   }
