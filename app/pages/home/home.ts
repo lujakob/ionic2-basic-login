@@ -21,17 +21,12 @@ export class HomePage {
     //this.counter$ = _appStore.select(counterSelector);
 
     _appStore.select(counterSelector).subscribe(counter => {
-      console.log("subscribed counter", counter);
       this.counter = counter;
     });
 
     _appStore.select(selectedClientSelector).subscribe(clientId => {
       this.clientId = clientId;
     });
-    _appStore.subscribe(state => {
-      console.log("subscribe to state change", state);
-    });
-
   }
 
   increment() {

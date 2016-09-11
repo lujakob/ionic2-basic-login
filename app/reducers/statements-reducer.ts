@@ -10,7 +10,6 @@ export default (state:any = {isFetchingStatements: "?", list: [], currentStateme
       return Object.assign({}, state, {isFetchingStatements: false, list: state.list.concat(action.statements)});
     }
     case StatementsActionTypes.SET_NEXT_OFFSET: {
-      console.log(action);
       return Object.assign({}, state, {nextOffset: action.nextOffset});
     }
 

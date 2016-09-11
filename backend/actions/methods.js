@@ -67,7 +67,7 @@ var functions = {
   getStatements: function(req, res) {
     var limit = 50,
         offset = 0,
-        defaultSortby = 'id',
+        defaultSortby = 'title',
         nextOffset,
         total;
 

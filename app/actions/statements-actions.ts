@@ -53,10 +53,8 @@ export class StatementsActions extends Actions {
         .map(data => {
           dispatch(this.setNextOffset(data.nextOffset));
           if(offset > 0) {
-            console.log("receiveStatementsAdd");
             dispatch(this.receiveStatementsAdd(data.data));
           } else {
-            console.log("receiveStatements");
             dispatch(this.receiveStatements(data.data));
           }
 

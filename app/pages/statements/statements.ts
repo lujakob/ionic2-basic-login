@@ -36,8 +36,15 @@ export class StatementsPage {
    * set state change subscriptions
    */
   ionViewWillEnter() {
+
+    // reset items offset on view enter
+    this.infiniteScroll.enable(true);
+    this._appStore.dispatch(this._statementsActions.setNextOffset(0));
+
     // subscribe to client select change and refetch statements
     this.selectedClientSubscriber = this._appStore.select(selectedClientSelector).subscribe(clientId => {
+      this.content.scrollToTop(0);
+      this.infiniteScroll.enable(true);
       this._appStore.dispatch(this._statementsActions.fetchStatements(clientId));
     });
 
