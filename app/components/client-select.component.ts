@@ -1,9 +1,15 @@
 import { Component, Inject } from '@angular/core';
 import { AlertController } from 'ionic-angular';
 import { Store } from '@ngrx/store';
-import { AppStore } from 'angular2-redux';
-import { selectedClientSelector } from '../reducers/select-clients-reducer';
-import { SelectClientsActions } from '../actions/select-clients-actions';
+import {
+  REQUEST_CONTENT,
+  RECEIVE_CONTENT,
+  RESET_CONTENT
+} from "../reducers/content";
+
+import {
+  SELECT_CLIENT
+} from "../reducers/selected-clients";
 
 @Component({
   selector: 'client-select',
@@ -61,8 +67,8 @@ export class ClientSelectComponent {
     alert.addButton({
       text: 'OK',
       handler: data => {
-        this.store.dispatch({type: 'RESET_CONTENT'});
-        this.store.dispatch({type: 'SELECT_CLIENT', payload: parseInt(data)});
+        this.store.dispatch({type: RESET_CONTENT});
+        this.store.dispatch({type: SELECT_CLIENT, payload: parseInt(data)});
       }
     });
     alert.present();

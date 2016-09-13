@@ -31,9 +31,10 @@ export class StatementsPage {
     this.statementsCount$ = store.select(state => state.content.total);
 
 
-    // // on state.content.isFetching change to false => complete infinite spinner
+    // on state.content.isFetching change to false => complete infinite spinner
     store.select(state => state.content.isFetching).skip(1).subscribe(isFetching => {
       if(!isFetching) {
+        console.log("infinite complete", isFetching);
         this.infiniteScroll.complete();
       }
     });
@@ -61,6 +62,7 @@ export class StatementsPage {
     // this.content.addScrollListener((e) => {
     //   console.log(e);
     // });
+    console.log("ionViewWillEnter");
     this.store.dispatch({type: REQUEST_CONTENT});
 
   }
@@ -77,6 +79,7 @@ export class StatementsPage {
    * @param infiniteScroll
    */
   doInfinite(infiniteScroll) {
+    console.log("doInfinite", infiniteScroll);
     this.store.dispatch({type: REQUEST_CONTENT});
   }
 

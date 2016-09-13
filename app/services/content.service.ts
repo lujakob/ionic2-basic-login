@@ -19,13 +19,11 @@ export class ContentService {
   ) {
 
     store.select(state => state.content.nextOffset).subscribe(nextOffset => {
-      console.log(this.nextOffset);
       this.nextOffset = nextOffset;
     });
-    // store.select('selectedClients').skip(1).subscribe(selectedClients => {
-    //   this.selectedClients = selectedClients;
-    //   this.getContent();
-    // });
+    store.select('selectedClients').skip(1).subscribe(selectedClients => {
+      this.selectedClients = selectedClients;
+    });
 
   }
   getContent() {

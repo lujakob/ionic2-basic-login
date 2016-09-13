@@ -28,9 +28,10 @@ export class ContentEffects {
     .switchMap(() => this._contentService.getContent())
     .map((data) => ({ type: RECEIVE_CONTENT, payload: data}));
 
-  // @Effect() selectClient$ = this._updates$
-  //   .whenAction(SELECT_CLIENT)
-  //   .map(({action}) => ({type: REQUEST_CONTENT, payload: {reddit: action.payload}}));
+  @Effect() selectClient$ = this._updates$
+    .whenAction(SELECT_CLIENT)
+    .map(({action}) => ({type: REQUEST_CONTENT}));
+
     // .switchMap(({action}) => (
     //   this._reddit
     //     .fetchPosts(action.payload.reddit)
