@@ -11,17 +11,17 @@ import {FilmsPage} from '../films/films';
 export class TabsPage {
   private homePage: any;
   private statementsPage: any;
-  private profilePage: any;
-  private chartPage: any;
-  private filmsPage: any;
+  // private profilePage: any;
+  // private chartPage: any;
+  // private filmsPage: any;
 
   constructor() {
     // // this tells the tabs component which Pages
     // // should be each tab's root Page
     this.homePage = HomePage;
     this.statementsPage = StatementsPage;
-    this.profilePage = ProfilePage;
-    this.chartPage = ChartPage;
-    this.filmsPage = FilmsPage;
+    // this.profilePage = ProfilePage;
+    // this.chartPage = ChartPage;
+    // this.filmsPage = FilmsPage;
   }
 }

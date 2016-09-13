@@ -20,6 +20,6 @@
 		decrement
 	</button>
 
-	<p>Counter: {{ counter }}</p>
-	<p>This is the current client Id {{clientId}}</p>
+	<h3>{{counter$ | async}}</h3>
+	<p>This is the current client Id {{ selectedClient$ | async }}</p>
 </ion-content>

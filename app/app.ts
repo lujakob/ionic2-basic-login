@@ -7,20 +7,15 @@ import {ProfilePage} from './pages/profile/profile';
 import {TabsPage} from './pages/tabs/tabs';
 import {AuthHttp, AuthConfig} from 'angular2-jwt';
 import { ClientSelectComponent } from './components/client-select.component';
+import { ContentService } from './services/content.service';
 
-import { AppStore, createAppStoreFactoryWithOptions } from "angular2-redux";
-import reducers from "./reducers/app-reducer";
-import { FilmActions } from "./actions/film-actions";
-import { CounterActions } from "./actions/counter-actions";
-import { StatementsActions } from "./actions/statements-actions";
-import { SelectClientsActions } from "./actions/select-clients-actions";
+
+import { provideStore } from "@ngrx/store";
+import { counter } from "./reducers/counter";
+import { selectedClients } from './reducers/selected-clients';
+import { content } from './reducers/content';
 
 import { AuthService } from './services/auth/auth';
-
-const appStoreFactory = createAppStoreFactoryWithOptions({
-  reducers,
-  debug:true
-});
 
 @Component({
   templateUrl: 'build/app.html',
@@ -68,8 +63,10 @@ export class MyApp {
 
 ionicBootstrap(MyApp, [
   AuthService,
-  provide(AppStore, { useFactory: appStoreFactory }),
-  FilmActions,  CounterActions,  SelectClientsActions, StatementsActions,
+  ContentService,
+  provideStore({counter, selectedClients, content}),
+  // provide(AppStore, { useFactory: appStoreFactory }),
+  // FilmActions,  CounterActions,  SelectClientsActions, StatementsActions,
   provide(AuthHttp, {
     useFactory: (http) => {
       return new AuthHttp(new AuthConfig, http);
