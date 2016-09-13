@@ -1,8 +1,14 @@
 import { Component, ViewChild } from '@angular/core';
 import { InfiniteScroll, Content } from 'ionic-angular';
-import { Store } from '@ngrx/store';
+import { Store } from '@ngrx/store'
+import { Observable } from 'rxjs/observable';
 import 'rxjs/add/operator/skip';
 import { ContentService } from '../../services/content.service';
+import {
+  REQUEST_CONTENT,
+  RECEIVE_CONTENT,
+  RESET_CONTENT
+} from "../../reducers/content";
 
 @Component({
   templateUrl: 'build/pages/statements/statements.html',
@@ -24,7 +30,8 @@ export class StatementsPage {
     this.statements$ = store.select(state => state.content.data);
     this.statementsCount$ = store.select(state => state.content.total);
 
-    // on state.content.isFetching change to false => complete infinite spinner
+
+    // // on state.content.isFetching change to false => complete infinite spinner
     store.select(state => state.content.isFetching).skip(1).subscribe(isFetching => {
       if(!isFetching) {
         this.infiniteScroll.complete();
@@ -51,7 +58,10 @@ export class StatementsPage {
 
     // scroll to top and fetch contents
     this.content.scrollToTop(0);
-    this.contentService.getContent();
+    // this.content.addScrollListener((e) => {
+    //   console.log(e);
+    // });
+    this.store.dispatch({type: REQUEST_CONTENT});
 
   }
 
@@ -59,7 +69,7 @@ export class StatementsPage {
    * reset state.content to initial values
    */
   ionViewDidLeave() {
-    this.store.dispatch({type: 'RESET_CONTENT'});
+    this.store.dispatch({type: RESET_CONTENT});
   }
 
   /**
@@ -67,7 +77,7 @@ export class StatementsPage {
    * @param infiniteScroll
    */
   doInfinite(infiniteScroll) {
-    this.contentService.getContent();
+    this.store.dispatch({type: REQUEST_CONTENT});
   }
 
 }

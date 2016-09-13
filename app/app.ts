@@ -8,9 +8,11 @@ import {TabsPage} from './pages/tabs/tabs';
 import {AuthHttp, AuthConfig} from 'angular2-jwt';
 import { ClientSelectComponent } from './components/client-select.component';
 import { ContentService } from './services/content.service';
+import { ContentEffects } from './effects/content-effects';
 
 
 import { provideStore,combineReducers } from "@ngrx/store";
+import { runEffects } from "@ngrx/effects";
 import { storeLogger } from "ngrx-store-logger";
 import { counter } from "./reducers/counter";
 import { selectedClients } from './reducers/selected-clients';
@@ -68,6 +70,7 @@ ionicBootstrap(MyApp, [
   provideStore(
     storeLogger()(combineReducers({counter, selectedClients, content}))
   ),
+  runEffects(ContentEffects),
   // provide(AppStore, { useFactory: appStoreFactory }),
   // FilmActions,  CounterActions,  SelectClientsActions, StatementsActions,
   provide(AuthHttp, {

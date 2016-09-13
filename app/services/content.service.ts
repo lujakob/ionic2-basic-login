@@ -19,35 +19,38 @@ export class ContentService {
   ) {
 
     store.select(state => state.content.nextOffset).subscribe(nextOffset => {
+      console.log(this.nextOffset);
       this.nextOffset = nextOffset;
     });
-    store.select('selectedClients').skip(1).subscribe(selectedClients => {
-      this.selectedClients = selectedClients;
-      this.getContent();
-    });
+    // store.select('selectedClients').skip(1).subscribe(selectedClients => {
+    //   this.selectedClients = selectedClients;
+    //   this.getContent();
+    // });
 
   }
   getContent() {
 
-
-    console.log("this.nextOffset", this.nextOffset);
     let url = BASE_URL + '?1=1' + (this.selectedClients > 0 ? '&clientId=' + this.selectedClients : '') + (this.nextOffset > 0 ? '&offset=' + this.nextOffset : '');
-
-    this.store.dispatch({type: 'REQUEST_CONTENT'});
     console.log("url", url);
-    this.http.get(url)
-      .map(res => res.json())
-      // .map(res => {
-      //   console.log(res);
-      //   return res;
-      // })
-      .map(payload => {
-        if(this.nextOffset > 0) {
-          return { type: 'RECEIVE_ADDITIONAL_CONTENT', payload };
-        } else {
-          return { type: 'RECEIVE_CONTENT', payload };
-        }
-      })
-      .subscribe(action => this.store.dispatch(action));
+
+    return this.http.get(url)
+      .map(res => res.json());
+
+    // this.store.dispatch({type: 'REQUEST_CONTENT'});
+    // console.log("url", url);
+    // this.http.get(url)
+    //   .map(res => res.json())
+    //   // .map(res => {
+    //   //   console.log(res);
+    //   //   return res;
+    //   // })
+    //   .map(payload => {
+    //     if(this.nextOffset > 0) {
+    //       return { type: 'RECEIVE_ADDITIONAL_CONTENT', payload };
+    //     } else {
+    //       return { type: 'RECEIVE_CONTENT', payload };
+    //     }
+    //   })
+    //   .subscribe(action => this.store.dispatch(action));
   }
 }
