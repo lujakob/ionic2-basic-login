@@ -5,18 +5,31 @@ This is a basic ionic2 implementation with a simple node express server to signu
 
 ## How to use ?
 
-- open terminal and run ionic serve
-- open new terminal tab and run mongod --dbpath /absolute/path/to/repo/backend/data/
-- open terminal tab and run mongo to enter the mongo shell
-- use <your database name>
-- open new terminal tab and run either node server.js or nodemon server.js
+Node server (serving static json data)
+
+- npm install
+
+- cd backend/
+- mongod --dbpath /absolute/path/to/repo/backend/data/ (in new terminal tab)
+
+optional:
+- mongo (in new tab, to enter the mongo shell)
+- use ionic-bmg (to select database)
+
+- nodemon server.js ( or node server.js) (in new terminal tab )
+- cd ../ (back to package.json directory)
+- ionic serve
 
 ( see backend/actions/methods.js file for REST Api endpoints and use Postman to test )
 
 ## Changelog
 This is a JsonWebToken based authentication. Login/Logout is being showed on the same page, depending on auth status.
 
-angular2-redux package, based upon the https://github.com/InfomediaLtd/angular2-redux-example working.
+ngrx/store package, based upon
+
+http://onehungrymind.com/build-better-angular-2-application-redux-ngrx/
+https://github.com/btroncone/ngrx-examples
+https://gist.github.com/btroncone/a6e4347326749f938510#slicing-state-for-views
 
 Statements serve via node server. Statements page working, filter by client selector, ordered by title.
 
