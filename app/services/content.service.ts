@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/observable';
+import 'rxjs/add/operator/skip';
 import { Http, Headers } from '@angular/http';
 
 const BASE_URL = 'http://localhost:3333/statements/';
@@ -11,26 +11,30 @@ export class ContentService {
   //content:Observable <any>;
 
   private nextOffset: number = 0;
+  private selectedClients: any = 0;
 
   constructor(
     private store:Store<any>,
     private http: Http
   ) {
-    //this.content = store.select('content');
+
     store.select(state => state.content.nextOffset).subscribe(nextOffset => {
       this.nextOffset = nextOffset;
     });
-    store.select('content').subscribe(content => {
-      console.log(content);
+    store.select('selectedClients').skip(1).subscribe(selectedClients => {
+      this.selectedClients = selectedClients;
+      this.getContent();
     });
 
   }
   getContent() {
 
-    let clientId = 0;
-    let url = BASE_URL + '?1=1' + (clientId > 0 ? '&clientId=' + clientId : '') + (this.nextOffset > 0 ? '&offset=' + this.nextOffset : '');
 
+    console.log("this.nextOffset", this.nextOffset);
+    let url = BASE_URL + '?1=1' + (this.selectedClients > 0 ? '&clientId=' + this.selectedClients : '') + (this.nextOffset > 0 ? '&offset=' + this.nextOffset : '');
 
+    this.store.dispatch({type: 'REQUEST_CONTENT'});
+    console.log("url", url);
     this.http.get(url)
       .map(res => res.json())
       // .map(res => {
@@ -39,9 +43,9 @@ export class ContentService {
       // })
       .map(payload => {
         if(this.nextOffset > 0) {
-          return { type: 'ADD_CONTENT_ITEMS', payload };
+          return { type: 'RECEIVE_ADDITIONAL_CONTENT', payload };
         } else {
-          return { type: 'LOAD_CONTENT', payload };
+          return { type: 'RECEIVE_CONTENT', payload };
         }
       })
       .subscribe(action => this.store.dispatch(action));

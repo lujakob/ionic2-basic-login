@@ -61,10 +61,8 @@ export class ClientSelectComponent {
     alert.addButton({
       text: 'OK',
       handler: data => {
+        this.store.dispatch({type: 'RESET_CONTENT'});
         this.store.dispatch({type: 'SELECT_CLIENT', payload: parseInt(data)});
-        //this.store.dispatch(ClientActions.setClient(parseInt(data)));
-        //this.client = data;
-        // this._appStore.dispatch(this._selectClientsActions.selectClient(parseInt(data)));
       }
     });
     alert.present();

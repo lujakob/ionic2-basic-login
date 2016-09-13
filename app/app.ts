@@ -10,7 +10,8 @@ import { ClientSelectComponent } from './components/client-select.component';
 import { ContentService } from './services/content.service';
 
 
-import { provideStore } from "@ngrx/store";
+import { provideStore,combineReducers } from "@ngrx/store";
+import { storeLogger } from "ngrx-store-logger";
 import { counter } from "./reducers/counter";
 import { selectedClients } from './reducers/selected-clients';
 import { content } from './reducers/content';
@@ -64,7 +65,9 @@ export class MyApp {
 ionicBootstrap(MyApp, [
   AuthService,
   ContentService,
-  provideStore({counter, selectedClients, content}),
+  provideStore(
+    storeLogger()(combineReducers({counter, selectedClients, content}))
+  ),
   // provide(AppStore, { useFactory: appStoreFactory }),
   // FilmActions,  CounterActions,  SelectClientsActions, StatementsActions,
   provide(AuthHttp, {
