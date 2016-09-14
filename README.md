@@ -1,7 +1,7 @@
 # Basic ionic2 login/register demo.
 
 ## Description
-This is a basic ionic2 implementation with a simple node express server to signup and login.
+This is a basic ionic2 implementation with a simple node express server. Ionic2 app implements the ngrx/store architecture with ngrx/store package. It's possible to signup, login, show statements (served from the node server), select clients and update statements data filtered by selected client accordingly.
 
 ## How to use ?
 
