@@ -4,7 +4,8 @@ import { Store } from '@ngrx/store';
 import {
   REQUEST_CONTENT,
   RECEIVE_CONTENT,
-  RESET_CONTENT
+  RESET_CONTENT,
+  RESET_OFFSET
 } from "../reducers/content";
 
 import {
@@ -67,7 +68,9 @@ export class ClientSelectComponent {
     alert.addButton({
       text: 'OK',
       handler: data => {
-        this.store.dispatch({type: RESET_CONTENT});
+        // new content is being fetchend, so reset the offset first
+        this.store.dispatch({type: RESET_OFFSET});
+        // select client. this action triggers an effect, to load new data
         this.store.dispatch({type: SELECT_CLIENT, payload: parseInt(data)});
       }
     });

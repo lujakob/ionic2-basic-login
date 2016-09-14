@@ -7,9 +7,9 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content #ionContent padding>
 	<p>Total statements: {{statementsCount$ | async}}</p>
-	<ion-list>
+	<ion-list #contentList>
 		<ion-item *ngFor="let item of statements$ | async">{{item.title}}, ID:{{item.id}} (client-id: {{item.clientId}}) <span class="statement-item-right">{{item.royalties}}</span></ion-item>
 	</ion-list>
 	<ion-infinite-scroll #infinite (ionInfinite)="doInfinite($event)">

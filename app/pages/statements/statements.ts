@@ -1,14 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
 import { InfiniteScroll, Content } from 'ionic-angular';
 import { Store } from '@ngrx/store'
-import { Observable } from 'rxjs/observable';
 import 'rxjs/add/operator/skip';
-import { ContentService } from '../../services/content.service';
-import {
-  REQUEST_CONTENT,
-  RECEIVE_CONTENT,
-  RESET_CONTENT
-} from "../../reducers/content";
+import { REQUEST_CONTENT, RESET_CONTENT } from "../../reducers/content";
 
 @Component({
   templateUrl: 'build/pages/statements/statements.html',
@@ -23,7 +17,6 @@ export class StatementsPage {
   @ViewChild(Content) content: Content;
 
   constructor(
-    private contentService: ContentService,
     private store: Store<any>
   ) {
 
@@ -34,7 +27,6 @@ export class StatementsPage {
     // on state.content.isFetching change to false => complete infinite spinner
     store.select(state => state.content.isFetching).skip(1).subscribe(isFetching => {
       if(!isFetching) {
-        console.log("infinite complete", isFetching);
         this.infiniteScroll.complete();
       }
     });
@@ -47,6 +39,7 @@ export class StatementsPage {
 
     // on state.selectedClients value change, enable infinite
     store.select('selectedClients').skip(1).subscribe(selectedClients => {
+      this.content.scrollToTop(0);
       this.infiniteScroll.enable(true);
     });
 
@@ -56,13 +49,9 @@ export class StatementsPage {
    * set state change subscriptions
    */
   ionViewWillEnter() {
-
     // scroll to top and fetch contents
     this.content.scrollToTop(0);
-    // this.content.addScrollListener((e) => {
-    //   console.log(e);
-    // });
-    console.log("ionViewWillEnter");
+    this.infiniteScroll.enable(true);
     this.store.dispatch({type: REQUEST_CONTENT});
 
   }
@@ -79,7 +68,6 @@ export class StatementsPage {
    * @param infiniteScroll
    */
   doInfinite(infiniteScroll) {
-    console.log("doInfinite", infiniteScroll);
     this.store.dispatch({type: REQUEST_CONTENT});
   }
 
