@@ -1,21 +1,13 @@
 import { Component, Inject } from '@angular/core';
 import { AlertController } from 'ionic-angular';
 import { Store } from '@ngrx/store';
-import {
-  REQUEST_CONTENT,
-  RECEIVE_CONTENT,
-  RESET_CONTENT,
-  RESET_OFFSET
-} from "../reducers/content";
 
-import {
-  SELECT_CLIENT
-} from "../reducers/selected-clients";
+import { ContentActions } from '../actions/content.actions';
+import { SelectClientActions} from '../actions/select-clients.actions';
 
 @Component({
   selector: 'client-select',
-  template: '<ion-icon name="person-add" (click)="clientSelect()" class="toolbar-client"></ion-icon>',
-  providers: []
+  template: '<ion-icon name="person-add" (click)="clientSelect()" class="toolbar-client"></ion-icon>'
 })
 export class ClientSelectComponent {
   private client: number = 0;
@@ -24,7 +16,9 @@ export class ClientSelectComponent {
 
   constructor(
     public alertCtrl: AlertController,
-    private store: Store<any>) {
+    private store: Store<any>,
+    private contentActions: ContentActions,
+    private selectClientsActions: SelectClientActions) {
 
     this.selectedClient$ = this.store.select('selectedClients');
     this.selectedClient$.subscribe((id) => this.selectedClient = id);
@@ -32,8 +26,7 @@ export class ClientSelectComponent {
   }
 
   clientSelect() {
-    // let selectedClient = 0;
-    console.log(this.selectedClient);
+
     let alertInputs = [
       {
         type: 'radio',
@@ -69,9 +62,9 @@ export class ClientSelectComponent {
       text: 'OK',
       handler: data => {
         // new content is being fetchend, so reset the offset first
-        this.store.dispatch({type: RESET_OFFSET});
+        this.store.dispatch(this.contentActions.resetOffset());
         // select client. this action triggers an effect, to load new data
-        this.store.dispatch({type: SELECT_CLIENT, payload: parseInt(data)});
+        this.store.dispatch(this.selectClientsActions.selectClient(parseInt(data)));
       }
     });
     alert.present();

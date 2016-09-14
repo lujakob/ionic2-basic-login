@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { InfiniteScroll, Content } from 'ionic-angular';
 import { Store } from '@ngrx/store'
 import 'rxjs/add/operator/skip';
-import { REQUEST_CONTENT, RESET_CONTENT } from "../../reducers/content";
+import { ContentActions } from '../../actions/content.actions';
 
 @Component({
   templateUrl: 'build/pages/statements/statements.html',
@@ -17,7 +17,8 @@ export class StatementsPage {
   @ViewChild(Content) content: Content;
 
   constructor(
-    private store: Store<any>
+    private store: Store<any>,
+    private contentActions: ContentActions
   ) {
 
     this.statements$ = store.select(state => state.content.data);
@@ -52,7 +53,7 @@ export class StatementsPage {
     // scroll to top and fetch contents
     this.content.scrollToTop(0);
     this.infiniteScroll.enable(true);
-    this.store.dispatch({type: REQUEST_CONTENT});
+    this.store.dispatch(this.contentActions.requestContent());
 
   }
 
@@ -60,7 +61,7 @@ export class StatementsPage {
    * reset state.content to initial values
    */
   ionViewDidLeave() {
-    this.store.dispatch({type: RESET_CONTENT});
+    this.store.dispatch(this.contentActions.resetContent());
   }
 
   /**
@@ -68,7 +69,7 @@ export class StatementsPage {
    * @param infiniteScroll
    */
   doInfinite(infiniteScroll) {
-    this.store.dispatch({type: REQUEST_CONTENT});
+    this.store.dispatch(this.contentActions.requestContent());
   }
 
 }

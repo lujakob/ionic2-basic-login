@@ -1,24 +1,25 @@
-import {Component, ViewChild, provide, PLATFORM_DIRECTIVES} from '@angular/core';
+import { Component, ViewChild, provide, PLATFORM_DIRECTIVES } from '@angular/core';
 import { Http } from '@angular/http';
-import {ionicBootstrap, Platform, MenuController, Nav} from 'ionic-angular';
-import {StatusBar} from 'ionic-native';
-import {ProfilePage} from './pages/profile/profile';
-
-import {TabsPage} from './pages/tabs/tabs';
-import {AuthHttp, AuthConfig} from 'angular2-jwt';
-import { ClientSelectComponent } from './components/client-select.component';
-import { ContentService } from './services/content.service';
-import { ContentEffects } from './effects/content-effects';
-
+import { AuthHttp, AuthConfig } from 'angular2-jwt';
+import { ionicBootstrap, Platform, MenuController, Nav } from 'ionic-angular';
+import { StatusBar } from 'ionic-native';
 
 import { provideStore,combineReducers } from "@ngrx/store";
 import { runEffects } from "@ngrx/effects";
 import { storeLogger } from "ngrx-store-logger";
-import { counter } from "./reducers/counter";
-import { selectedClients } from './reducers/selected-clients';
-import { content } from './reducers/content';
 
+import { ProfilePage } from './pages/profile/profile';
+import { TabsPage } from './pages/tabs/tabs';
+
+import { ClientSelectComponent } from './components/client-select.component';
+
+import { ContentService } from './services/content.service';
 import { AuthService } from './services/auth/auth';
+
+import { ContentEffects } from './effects/content-effects';
+import { ContentActions } from './actions/content.actions';
+import { SelectClientActions } from './actions/select-clients.actions';
+import { reducer } from "./reducers";
 
 @Component({
   templateUrl: 'build/app.html',
@@ -33,8 +34,8 @@ export class MyApp {
 
   constructor(
     public platform: Platform,
-    public menu: MenuController,
-    public service: AuthService
+    public service: AuthService,
+    public menu: MenuController
   ) {
 
     this.initializeAuthGuard();
@@ -67,12 +68,13 @@ export class MyApp {
 ionicBootstrap(MyApp, [
   AuthService,
   ContentService,
+  ContentActions,
+  SelectClientActions,
   provideStore(
-    storeLogger()(combineReducers({counter, selectedClients, content}))
+    // storeLogger()(combineReducers(reducer))
+    combineReducers(reducer)
   ),
   runEffects(ContentEffects),
-  // provide(AppStore, { useFactory: appStoreFactory }),
-  // FilmActions,  CounterActions,  SelectClientsActions, StatementsActions,
   provide(AuthHttp, {
     useFactory: (http) => {
       return new AuthHttp(new AuthConfig, http);

@@ -8,7 +8,6 @@ const HEADER = { headers: new Headers({ 'Content-Type': 'application/json' }) };
 
 @Injectable()
 export class ContentService {
-  //content:Observable <any>;
 
   private nextOffset: number = 0;
   private selectedClients: any = 0;
@@ -18,37 +17,19 @@ export class ContentService {
     private http: Http
   ) {
 
+    // update nextOffset on state.content.nextOffset change
     store.select(state => state.content.nextOffset).subscribe(nextOffset => {
       this.nextOffset = nextOffset;
     });
+    // update selectedClients on state.selectedClients change
     store.select('selectedClients').skip(1).subscribe(selectedClients => {
       this.selectedClients = selectedClients;
     });
-
   }
+
   getContent() {
-
     let url = BASE_URL + '?1=1' + (this.selectedClients > 0 ? '&clientId=' + this.selectedClients : '') + (this.nextOffset > 0 ? '&offset=' + this.nextOffset : '');
-    console.log("url", url);
 
-    return this.http.get(url)
-      .map(res => res.json());
-
-    // this.store.dispatch({type: 'REQUEST_CONTENT'});
-    // console.log("url", url);
-    // this.http.get(url)
-    //   .map(res => res.json())
-    //   // .map(res => {
-    //   //   console.log(res);
-    //   //   return res;
-    //   // })
-    //   .map(payload => {
-    //     if(this.nextOffset > 0) {
-    //       return { type: 'RECEIVE_ADDITIONAL_CONTENT', payload };
-    //     } else {
-    //       return { type: 'RECEIVE_CONTENT', payload };
-    //     }
-    //   })
-    //   .subscribe(action => this.store.dispatch(action));
+    return this.http.get(url).map(res => res.json());
   }
 }

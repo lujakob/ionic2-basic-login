@@ -23,7 +23,8 @@ optional:
 ( see backend/actions/methods.js file for REST Api endpoints and use Postman to test )
 
 ## Changelog
-This is a JsonWebToken based authentication. Login/Logout is being showed on the same page, depending on auth status.
+This is a JsonWebToken based authentication.
+Login/Logout is being showed on the same page, depending on auth status.
 
 ngrx/store package, based upon
 
@@ -31,7 +32,9 @@ http://onehungrymind.com/build-better-angular-2-application-redux-ngrx/
 https://github.com/btroncone/ngrx-examples
 https://gist.github.com/btroncone/a6e4347326749f938510#slicing-state-for-views
 
-Statements serve via node server. Statements page working, filter by client selector, ordered by title.
+- Statements serve via node server.
+- Statements page working
+- filter by client selector, ordered by title.
 
 http://localhost:3333/statements returns json array of statement items.
 

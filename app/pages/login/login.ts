@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {NavController} from 'ionic-angular';
-import {AuthService} from '../../services/authservice';
+import {AuthService} from '../../services/auth.service';
 import {UserPage} from '../user/user';
 import {SignupPage} from '../signup/signup';
 
@@ -12,13 +12,13 @@ export class LoginPage {
     private usercreds: any;
     private service: any;
     private nav: any;
-    constructor(private authservice: AuthService, private navcontroller: NavController) {
+    constructor(private authService: AuthService, private navController: NavController) {
         this.usercreds = {
             name: '',
             password: ''
         }
-        this.service = authservice;
-        this.nav = navcontroller;
+        this.service = authService;
+        this.nav = navController;
     }
     login(user) {
         this.service.authenticate(user).then(data => {
