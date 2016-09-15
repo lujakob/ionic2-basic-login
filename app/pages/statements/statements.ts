@@ -1,9 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { NavController, InfiniteScroll, Content } from 'ionic-angular';
 import { AppStore } from 'angular2-redux';
-import { statementsSelector, statementsCountSelector, isFetchingStatementsSelector, statementsNextOffsetSelector } from '../../reducers/statements-reducer';
+import { contentListSelector, contentTotalSelector, contentIsFetchingSelector, contentNextOffsetSelector } from '../../reducers/content-reducer';
 import { selectedClientSelector } from '../../reducers/select-clients-reducer';
-import {StatementsActions} from "../../actions/statements-actions";
+import { ContentActions } from "../../actions/content-actions";
 import {Subscription} from "rxjs/Rx";
 
 @Component({
@@ -24,12 +24,17 @@ export class StatementsPage {
 
   constructor(
     private navCtrl: NavController,
-    private _statementsActions: StatementsActions,
+    private _contentActions: ContentActions,
     private _appStore: AppStore
   ) {
 
-    this.statements$ = _appStore.select(statementsSelector);
-    this.statementsCount$ = _appStore.select(statementsCountSelector);
+    this.statements$ = _appStore.select(contentListSelector);
+    this.statementsCount$ = _appStore.select(contentTotalSelector);
+
+    // this._appStore.subscribe((state) => {
+    //   console.log(state);
+    // });
+
   }
 
   /**
@@ -39,24 +44,24 @@ export class StatementsPage {
 
     // reset items offset on view enter
     this.infiniteScroll.enable(true);
-    this._appStore.dispatch(this._statementsActions.setNextOffset(0));
+    this._appStore.dispatch(this._contentActions.resetNextOffset());
 
     // subscribe to client select change and refetch statements
     this.selectedClientSubscriber = this._appStore.select(selectedClientSelector).subscribe(clientId => {
       this.content.scrollToTop(0);
       this.infiniteScroll.enable(true);
-      this._appStore.dispatch(this._statementsActions.fetchStatements(clientId));
+      this._appStore.dispatch(this._contentActions.fetchContent(clientId));
     });
 
     // subscribe to isFetching change and hide spinner if isFetching == false
-    this.isFetchingStatementsSubscriber = this._appStore.select(isFetchingStatementsSelector).subscribe(isFetching => {
+    this.isFetchingStatementsSubscriber = this._appStore.select(contentIsFetchingSelector).subscribe(isFetching => {
       if(!isFetching) {
         this.infiniteScroll.complete();
       }
     });
 
     // subscribe to nextOffset and disable infiniteScroll if value is -1 ( = no more items available)
-    this.statementsNextOffsetSubscriber = this._appStore.select(statementsNextOffsetSelector).subscribe(nextOffset => {
+    this.statementsNextOffsetSubscriber = this._appStore.select(contentNextOffsetSelector).subscribe(nextOffset => {
       if(nextOffset < 0) {
         this.infiniteScroll.enable(false);
       }
@@ -78,7 +83,7 @@ export class StatementsPage {
    * @param infiniteScroll
    */
   doInfinite(infiniteScroll) {
-    this._appStore.dispatch(this._statementsActions.fetchStatements(this._appStore.getState().selectClients, this._appStore.getState().statements.nextOffset));
+    this._appStore.dispatch(this._contentActions.fetchContent(this._appStore.getState().selectClients, this._appStore.getState().content.nextOffset));
   }
 
 }

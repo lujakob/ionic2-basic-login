@@ -13,7 +13,6 @@ export interface SelectClientsAction {
 
 @Injectable()
 export class SelectClientsActions extends Actions {
-
   constructor(appStore:AppStore) {
     super(appStore);
   }

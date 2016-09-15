@@ -3,6 +3,7 @@ import { AlertController } from 'ionic-angular';
 import { AppStore } from 'angular2-redux';
 import { selectedClientSelector } from '../reducers/select-clients-reducer';
 import { SelectClientsActions } from '../actions/select-clients-actions';
+import { ContentActions } from '../actions/content-actions';
 
 @Component({
   selector: 'client-select',
@@ -14,7 +15,8 @@ export class ClientSelectComponent {
   constructor(
     public alertCtrl: AlertController,
     private _appStore: AppStore,
-    private _selectClientsActions: SelectClientsActions) {
+    private _selectClientsActions: SelectClientsActions,
+    private _contentActions: ContentActions) {
   }
 
   clientSelect() {
@@ -56,6 +58,7 @@ export class ClientSelectComponent {
       handler: data => {
         //this.store.dispatch(ClientActions.setClient(parseInt(data)));
         //this.client = data;
+        this._appStore.dispatch((this._contentActions.resetNextOffset()));
         this._appStore.dispatch(this._selectClientsActions.selectClient(parseInt(data)));
       }
     });
