@@ -9,11 +9,11 @@ import { AuthHttp, AuthConfig } from 'angular2-jwt';
 import { ClientSelectComponent } from './components/client-select.component';
 
 import { AppStore, createAppStoreFactoryWithOptions } from "angular2-redux";
-import reducers from "./reducers/app-reducer";
-import { FilmActions } from "./actions/film-actions";
-import { CounterActions } from "./actions/counter-actions";
-import { ContentActions } from "./actions/content-actions";
-import { SelectClientsActions } from "./actions/select-clients-actions";
+import reducers from "./reducers/app.reducer";
+import { FilmActions } from "./actions/film.actions";
+import { CounterActions } from "./actions/counter.actions";
+import { ContentActions } from "./actions/content.actions";
+import { SelectClientsActions } from "./actions/select-clients.actions";
 
 import { AuthService } from './services/auth/auth';
 

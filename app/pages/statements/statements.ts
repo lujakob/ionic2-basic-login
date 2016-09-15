@@ -1,14 +1,15 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { NavController, InfiniteScroll, Content } from 'ionic-angular';
 import { AppStore } from 'angular2-redux';
-import { contentListSelector, contentTotalSelector, contentIsFetchingSelector, contentNextOffsetSelector } from '../../reducers/content-reducer';
-import { selectedClientSelector } from '../../reducers/select-clients-reducer';
-import { ContentActions } from "../../actions/content-actions";
+import { contentListSelector, contentTotalSelector, contentIsFetchingSelector, contentNextOffsetSelector } from '../../reducers/content.reducer';
+import { selectedClientSelector } from '../../reducers/select-clients.reducer';
+import { ContentActions } from "../../actions/content.actions";
 import {Subscription} from "rxjs/Rx";
 
 @Component({
   templateUrl: 'build/pages/statements/statements.html',
   providers: [InfiniteScroll],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class StatementsPage {
 

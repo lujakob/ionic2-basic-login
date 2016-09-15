@@ -1,8 +1,8 @@
-import { ContentActionTypes, ContentActionsInterface } from '../actions/content-actions';
+import { ContentActionTypes, ContentActionsInterface } from '../actions/content.actions';
 
 export const initialState = {isFetching: "?", list: [], nextOffset: 0, total: 0};
 
-export default (state:any = initialState, action:ContentActionsInterface = {type:"?"}) => {
+export const content = (state:any = initialState, action:ContentActionsInterface = {type:"?"}) => {
   switch (action.type) {
     case ContentActionTypes.REQUEST_CONTENT:
       return Object.assign({}, state, {isFetching: true});

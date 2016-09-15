@@ -1,6 +1,8 @@
-import { CounterActionTypes, CounterAction} from '../actions/counter-actions';
+import { CounterActionTypes, CounterAction} from '../actions/counter.actions';
 
-export default (state = 0, action:CounterAction = {type:"?"}) => {
+export const initialState = 0;
+
+export const counter = (state = initialState, action:CounterAction = {type:"?"}) => {
   switch (action.type) {
     case CounterActionTypes.INCREMENT: {
       return state + 1;

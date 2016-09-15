@@ -1,9 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { AlertController } from 'ionic-angular';
 import { AppStore } from 'angular2-redux';
-import { selectedClientSelector } from '../reducers/select-clients-reducer';
-import { SelectClientsActions } from '../actions/select-clients-actions';
-import { ContentActions } from '../actions/content-actions';
+import { SelectClientsActions } from '../actions/select-clients.actions';
+import { ContentActions } from '../actions/content.actions';
 
 @Component({
   selector: 'client-select',

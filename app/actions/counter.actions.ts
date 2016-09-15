@@ -1,5 +1,5 @@
-import {Injectable} from "@angular/core";
-import {Actions, AppStore} from "angular2-redux";
+import { Injectable, Inject } from "@angular/core";
+import { Actions, AppStore } from "angular2-redux";
 
 type Types = "INCREMENT" | "DECREMENT";
 export const CounterActionTypes = {
@@ -15,6 +15,7 @@ export interface CounterAction {
 @Injectable()
 export class CounterActions extends Actions {
 
+  // constructor(@Inject(AppStore) appStore:AppStore) {
   constructor(appStore:AppStore) {
     super(appStore);
   }

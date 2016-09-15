@@ -31,6 +31,9 @@
     "zone.js": "0.6.12"
   },
   "devDependencies": {
+    "@types/jasmine": "^2.2.33",
+    "browserify": "13.0.0",
+    "browserify-istanbul": "2.0.0",
     "del": "2.2.0",
     "gulp": "3.9.1",
     "gulp-watch": "4.3.5",
@@ -40,8 +43,15 @@
     "ionic-gulp-sass-build": "^1.0.0",
     "ionic-gulp-scripts-copy": "^2.0.0",
     "ionic-gulp-tslint": "^1.0.0",
-    "tslint-ionic-rules": "0.0.4",
-    "run-sequence": "1.1.5"
+    "isparta": "4.0.0",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.22",
+    "karma-browserify": "5.0.5",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-jasmine": "^1.0.2",
+    "run-sequence": "1.1.5",
+    "tsify": "0.16.0",
+    "tslint-ionic-rules": "0.0.4"
   },
   "cordovaPlugins": [
     "cordova-plugin-device",
@@ -59,6 +69,9 @@
       "locator": "ios"
     }
   ],
+  "scripts": {
+    "test": "karma start karma.conf.js"
+  },
   "name": "bmg",
   "description": "bmg: An Ionic project"
 }

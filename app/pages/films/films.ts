@@ -1,10 +1,10 @@
 import { NavController } from 'ionic-angular';
 import {Component} from '@angular/core'
 import {AppStore} from "angular2-redux";
-import {FilmActions} from "../../actions/film-actions";
+import {FilmActions} from "../../actions/film.actions";
 import {FilmSelectionView} from "./film-selection-view";
 import {FilmView} from "./film-view";
-import {currentFilmSelector,filmsCountSelector,isFetchingFilmSelector} from "../../reducers/films-reducer";
+import {currentFilmSelector,filmsCountSelector,isFetchingFilmSelector} from "../../reducers/films.reducer";
 
 // @Component({
 //   templateUrl: 'build/pages/films/films.html',
