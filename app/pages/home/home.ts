@@ -17,7 +17,7 @@ export class HomePage {
 
   constructor(private _appStore:AppStore,
               private _counterActions:CounterActions) {
-    
+
     this.increment = _counterActions.createDispatcher(_counterActions.increment);
     this.decrement = _counterActions.createDispatcher(_counterActions.decrement);
 

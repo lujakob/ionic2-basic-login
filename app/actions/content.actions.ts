@@ -3,8 +3,7 @@ import { Injectable } from "@angular/core";
 import { Actions, AppStore } from "angular2-redux";
 import 'rxjs/add/operator/map';
 
-const BASE_URL = "http://localhost:3333/statements";
-// const BASE_URL = "data/statementsData.json";
+import { ContentService } from '../services/content.service';
 
 type Types = "REQUEST_CONTENT" | "RECEIVE_CONTENT" |
   "RECEIVE_CONTENT_ADD" |
@@ -31,24 +30,25 @@ export interface ContentActionsInterface {
 @Injectable()
 export class ContentActions extends Actions {
 
-  constructor(private _http:Http, appStore:AppStore) {
+  constructor(
+    private _contentService: ContentService,
+    appStore:AppStore) {
     super(appStore);
   }
 
   fetchContent(clientId = 0, offset = 0) {
     return (dispatch) => {
-      let url = BASE_URL + '?1=1' + (clientId > 0 ? '&clientId=' + clientId : '') + (offset > 0 ? '&offset=' + offset : '');
+      let path = '/?1=1' + (clientId > 0 ? '&clientId=' + clientId : '') + (offset > 0 ? '&offset=' + offset : '');
       dispatch(this.requestContent());
 
-      this._http.get(url)
-        .map(res => res.json())
+      this._contentService.getContent(path)
         .map(data => {
           dispatch(this.receiveContent(data));
         })
         .subscribe();
+
     };
   }
-
 
   requestContent() {
     return {type: ContentActionTypes.REQUEST_CONTENT};
