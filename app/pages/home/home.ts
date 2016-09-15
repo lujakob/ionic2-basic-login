@@ -11,14 +11,15 @@ import { selectedClientSelector } from "../../reducers/select-clients.reducer";
 })
 export class HomePage {
   public clientId: number = 0;
-  private counter$;
   private counter;
-  private unsubscribe:()=>void;
+  private increment;
+  private decrement;
 
   constructor(private _appStore:AppStore,
               private _counterActions:CounterActions) {
-
-    //this.counter$ = _appStore.select(counterSelector);
+    
+    this.increment = _counterActions.createDispatcher(_counterActions.increment);
+    this.decrement = _counterActions.createDispatcher(_counterActions.decrement);
 
     _appStore.select(counterSelector).subscribe(counter => {
       this.counter = counter;
@@ -28,31 +29,5 @@ export class HomePage {
       this.clientId = clientId;
     });
   }
-
-  increment() {
-    this._appStore.dispatch(this._counterActions.increment());
-    console.log("increment");
-  }
-
-  decrement() {
-    this._appStore.dispatch(this._counterActions.decrement());
-    console.log("decrement");
-  }
-
-  // public ngOnDestroy() {
-  //   // unsubscribe when the component is destroyed
-  //   this.unsubscribe();
-  // }
-  // constructor(@Inject(AppStore) private store: Store<AppState>) {
-  //   store.subscribe(() => this.readState());
-  //   this.readState();
-  // }
-
-  // readState() {
-  //   let state: AppState = this.store.getState() as AppState;
-  //   this.clientId = state.clientId;
-  // }
-  //
-
 
 }
