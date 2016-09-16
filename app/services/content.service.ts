@@ -13,9 +13,7 @@ export type IAPIContent = {
 
 @Injectable()
 export class ContentService {
-  constructor(private _http:Http) {
-
-  }
+  constructor(private _http:Http) {}
 
   /**
    *

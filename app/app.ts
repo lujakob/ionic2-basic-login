@@ -18,6 +18,7 @@ import { SelectClientsActions } from "./actions/select-clients.actions";
 
 import { AuthService } from './services/auth/auth';
 import { ContentService } from './services/content.service';
+import { ClientService } from './services/client.service';
 
 const appStoreFactory = createAppStoreFactoryWithOptions({
   reducers,
@@ -71,6 +72,7 @@ export class MyApp {
 ionicBootstrap(MyApp, [
   AuthService,
   ContentService,
+  ClientService,
   provide(AppStore, { useFactory: appStoreFactory }),
   FilmActions,  CounterActions, SelectClientsActions, ContentActions,
   provide(AuthHttp, {

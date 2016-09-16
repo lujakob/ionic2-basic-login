@@ -16,7 +16,6 @@ export const content = (state:any = initialState, action:ContentActionsInterface
     case ContentActionTypes.RESET_NEXT_OFFSET: {
       return Object.assign({}, state, {nextOffset: initialState.nextOffset});
     }
-
     case ContentActionTypes.RECEIVE_CONTENT_LIST_TOTAL:
       return Object.assign({}, state, {count: action.total});
     default:

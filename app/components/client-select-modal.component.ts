@@ -1,5 +1,8 @@
 import {Component} from '@angular/core';
 import {Platform, NavParams, ViewController} from 'ionic-angular';
+import { AppStore } from 'angular2-redux';
+import { selectedClientsListSelector} from '../reducers/select-clients.reducer';
+import { SelectClientsActions }from '../actions/select-clients.actions';
 
 @Component({
   template: `
@@ -19,7 +22,7 @@ import {Platform, NavParams, ViewController} from 'ionic-angular';
 
 <ion-content padding>
   <div>
-    <ion-segment [(ngModel)]="pet">
+    <ion-segment [(ngModel)]="segmentView">
       <ion-segment-button value="all">
         All clients
       </ion-segment-button>
@@ -29,24 +32,11 @@ import {Platform, NavParams, ViewController} from 'ionic-angular';
     </ion-segment>
   </div>
   
-  <div [ngSwitch]="pet">
+  <div [ngSwitch]="segmentView">
     <ion-list *ngSwitchCase="'all'">
-      <ion-item>
-        <h2>Ruby</h2>
+      <ion-item *ngFor="let client of clients$ | async" (click)="updateStatus(client)">
+        <h2>{{client.title}}</h2>
       </ion-item>
-      <ion-item>
-        <h2>Ruby</h2>
-      </ion-item>
-      <ion-item>
-        <h2>Ruby</h2>
-      </ion-item>
-      <ion-item>
-        <h2>Ruby</h2>
-      </ion-item>
-      <ion-item>
-        <h2>Ruby</h2>
-      </ion-item>
-      
     </ion-list>
   
     <ion-list *ngSwitchCase="'applied'">
@@ -55,76 +45,35 @@ import {Platform, NavParams, ViewController} from 'ionic-angular';
       </ion-item>
       <ion-item>
         <h2>Luna</h2>
-      </ion-item>
-      <ion-item>
-        <h2>Luna</h2>
-      </ion-item>
-      <ion-item>
-        <h2>Luna</h2>
-      </ion-item>
-      <ion-item>
-        <h2>Luna</h2>
-      </ion-item>
-      <ion-item>
-        <h2>Luna</h2>
-      </ion-item>
-      <ion-item>
-        <h2>Luna</h2>
-      </ion-item>
-      <ion-item>
-        <h2>Luna</h2>
-      </ion-item>
-      
+      </ion-item>      
     </ion-list>
   </div>
 </ion-content>
 `
 })
 export class ClientSelectModalComponent {
-  character;
-  public pet: string = 'all';
+  private clients$;
+  public segmentView: string = 'all';
 
   constructor(
     public platform: Platform,
     public params: NavParams,
-    public viewCtrl: ViewController
+    public viewCtrl: ViewController,
+    private _appStore: AppStore,
+    private _clientActions: SelectClientsActions
   ) {
-    var characters = [
-      {
-        name: 'Gollum',
-        quote: 'Sneaky little hobbitses!',
-        image: 'img/avatar-gollum.jpg',
-        items: [
-          { title: 'Race', note: 'Hobbit' },
-          { title: 'Culture', note: 'River Folk' },
-          { title: 'Alter Ego', note: 'Smeagol' }
-        ]
-      },
-      {
-        name: 'Frodo',
-        quote: 'Go back, Sam! I\'m going to Mordor alone!',
-        image: 'img/avatar-frodo.jpg',
-        items: [
-          { title: 'Race', note: 'Hobbit' },
-          { title: 'Culture', note: 'Shire Folk' },
-          { title: 'Weapon', note: 'Sting' }
-        ]
-      },
-      {
-        name: 'Samwise Gamgee',
-        quote: 'What we need is a few good taters.',
-        image: 'img/avatar-samwise.jpg',
-        items: [
-          { title: 'Race', note: 'Hobbit' },
-          { title: 'Culture', note: 'Shire Folk' },
-          { title: 'Nickname', note: 'Sam' }
-        ]
-      }
-    ];
-    this.character = characters[this.params.get('charNum')];
+    this.clients$ = _appStore.select(selectedClientsListSelector);
+  }
+
+  ionViewWillEnter() {
+    this._appStore.dispatch(this._clientActions.fetchClients());
   }
 
   dismiss() {
     this.viewCtrl.dismiss();
+  }
+
+  updateStatus(client) {
+    console.log(client);
   }
 }

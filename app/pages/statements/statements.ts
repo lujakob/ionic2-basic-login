@@ -2,7 +2,7 @@ import { Component, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { NavController, InfiniteScroll, Content } from 'ionic-angular';
 import { AppStore } from 'angular2-redux';
 import { contentListSelector, contentTotalSelector, contentIsFetchingSelector, contentNextOffsetSelector } from '../../reducers/content.reducer';
-import { selectedClientSelector } from '../../reducers/select-clients.reducer';
+import { selectedClientSelector, selectedClientsListSelector } from '../../reducers/select-clients.reducer';
 import { ContentActions } from "../../actions/content.actions";
 import { Subscription } from "rxjs/Rx";
 import { ClientSelectButton } from '../../components/client-select-button.component';
@@ -34,9 +34,9 @@ export class StatementsPage {
     this.statements$ = _appStore.select(contentListSelector);
     this.statementsCount$ = _appStore.select(contentTotalSelector);
 
-    // this._appStore.subscribe((state) => {
-    //   console.log(state);
-    // });
+    this._appStore.subscribe((state) => {
+      console.log(state);
+    });
 
   }
 

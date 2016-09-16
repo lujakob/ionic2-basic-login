@@ -23,7 +23,7 @@ export class ClientListButton {
    */
   clientSelect() {
     // let selectedClient = this.store.getState().clientId;
-    let selectedClient = this._appStore.getState().selectClients;
+    let selectedClient = this._appStore.getState().selectClients.selectedClient;
     let alertInputs = [
       {
         type: 'radio',
