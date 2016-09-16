@@ -5,11 +5,11 @@ import { SelectClientsActions } from '../actions/select-clients.actions';
 import { ContentActions } from '../actions/content.actions';
 
 @Component({
-  selector: 'client-select',
-  template: '<ion-icon name="person-add" (click)="clientSelect()" class="toolbar-client"></ion-icon>',
+  selector: 'client-list-button',
+  template: '<ion-icon name="list" (click)="clientSelect()" class="toolbar-client toolbar-button client-list-button"></ion-icon>',
   providers: []
 })
-export class ClientSelectComponent {
+export class ClientListButton {
   private client: number = 0;
   constructor(
     public alertCtrl: AlertController,
@@ -18,6 +18,9 @@ export class ClientSelectComponent {
     private _contentActions: ContentActions) {
   }
 
+  /**
+   * create and show alert component
+   */
   clientSelect() {
     // let selectedClient = this.store.getState().clientId;
     let selectedClient = this._appStore.getState().selectClients;

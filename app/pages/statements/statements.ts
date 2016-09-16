@@ -4,7 +4,8 @@ import { AppStore } from 'angular2-redux';
 import { contentListSelector, contentTotalSelector, contentIsFetchingSelector, contentNextOffsetSelector } from '../../reducers/content.reducer';
 import { selectedClientSelector } from '../../reducers/select-clients.reducer';
 import { ContentActions } from "../../actions/content.actions";
-import {Subscription} from "rxjs/Rx";
+import { Subscription } from "rxjs/Rx";
+import { ClientSelectButton } from '../../components/client-select-button.component';
 
 @Component({
   templateUrl: 'build/pages/statements/statements.html',
@@ -22,6 +23,7 @@ export class StatementsPage {
 
   @ViewChild(InfiniteScroll) infiniteScroll: InfiniteScroll;
   @ViewChild(Content) content: Content;
+  @ViewChild(ClientSelectButton) clientSelectButton: ClientSelectButton;
 
   constructor(
     private navCtrl: NavController,
@@ -35,6 +37,13 @@ export class StatementsPage {
     // this._appStore.subscribe((state) => {
     //   console.log(state);
     // });
+
+  }
+
+  ionViewLoaded() {
+    setTimeout(() => {
+      this.clientSelectButton.openModal();
+    }, 500);
 
   }
 
