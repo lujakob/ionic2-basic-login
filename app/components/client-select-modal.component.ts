@@ -27,14 +27,15 @@ import { SelectClientsActions }from '../actions/select-clients.actions';
     </ion-segment-button>
 </ion-segment>
 <div class="client-select-toolbar">
-    <button (click)="deselectAll()">Deselect all</button>
+    <button clear (click)="deselectAll()">Deselect all</button>
+    <button clear (click)="selectAll()">Select all</button>
 </div>
 <ion-content class="client-select-modal">
     <div [ngSwitch]="segmentView" class="client-select-modal-list">
         <div *ngSwitchCase="'all'">
             <ion-list>
                 <ion-item *ngFor="let client of allClients$ | async" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)">
-                    <h2><span class="client-id">{{client.id}}</span><span class="client-title">{{client.clientName | truncate : 10}}($ID{{client.currencyId}})</span></h2>
+                    <h2><span class="client-id">{{client.id}}</span><span class="client-title">{{client.clientName | truncate : 10}}($ID{{client.currencyId}}){{client.state}}</span></h2>
                 </ion-item>
             </ion-list>
         </div>
@@ -67,8 +68,8 @@ export class ClientSelectModalComponent {
                 private _clientActions:SelectClientsActions) {
         this.allClients$ = _appStore.select(selectedClientsListSelector);
         this.appliedClients$ = _appStore.select(appliedClientsListSelector);
-        _appStore.select(selectedClientsListSelector).subscribe((data) => console.log("all", data));
-        _appStore.select(appliedClientsListSelector).subscribe((data) => console.log("applied", data));
+        // _appStore.select(selectedClientsListSelector).subscribe((data) => console.log("all", data));
+        // _appStore.select(appliedClientsListSelector).subscribe((data) => console.log("applied", data));
     }
 
     ionViewWillEnter() {
@@ -91,24 +92,23 @@ export class ClientSelectModalComponent {
         this.viewCtrl.dismiss();
     }
 
-    updateClientStatus(client) {
-        var newClientState = '';
-        if(this.segmentView === 'all') {
-            newClientState = client.state !== 'selected' ? 'selected' : '';
-        } else {
-            newClientState = client.state !== 'applied' ? 'applied' : 'deselected';
-        }
+    selectAll() {
+        this._appStore.dispatch(this._clientActions.selectAllClients(this.segmentView));
+    }
 
-        this._appStore.dispatch(this._clientActions.updateClientState(client.id, newClientState));
+    deselectAll() {
+        this._appStore.dispatch(this._clientActions.deselectAllClients(this.segmentView));
+    }
+
+    updateClientStatus(client) {
+        this._appStore.dispatch(this._clientActions.updateClientState(client.id, client.state, this.segmentView));
     }
 
     applySelect() {
         if(this.segmentView === 'all') {
             this._appStore.dispatch((this._clientActions.applySelectedClients()));
-            console.log('apply select: ' + this.segmentView);
         } else {
             this._appStore.dispatch((this._clientActions.applyDeselectedClients()));
-            console.log('apply deselect: ' + this.segmentView);
         }
 
     }

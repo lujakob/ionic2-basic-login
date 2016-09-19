@@ -1,4 +1,5 @@
 import { SelectClientsActionTypes, SelectClientsAction } from '../actions/select-clients.actions';
+import * as _ from 'lodash';
 
 export const initialState = {isFetching: '?', selectedClient: 0, list: [], applied: [], nextOffset: 0};
 
@@ -6,20 +7,39 @@ export const selectClients = (state:any = initialState, action:SelectClientsActi
     switch (action.type) {
         case SelectClientsActionTypes.SELECT_CLIENT: {
             let newState = Object.assign({}, state, {selectedClient: action.clientId });
-            console.log(newState);
             return newState;
         }
+
+        case SelectClientsActionTypes.SELECT_ALL_CLIENTS: {
+            return Object.assign({}, state, {
+                list: state.list.map(item => {
+                    if (item.state === '') {
+                        item.state = 'selected';
+                    }
+                    return item;
+                })
+            });
+        }
+
+        case SelectClientsActionTypes.DESELECT_ALL_CLIENTS: {
+            return Object.assign({}, state, {
+                list: state.list.map(item => {
+                    item.state = (item.state === 'selected') ? '' : item.state;
+                    return item;
+                })
+            });
+        }
+
         case SelectClientsActionTypes.APPLY_SELECTED_CLIENTS: {
             return Object.assign({}, state, {
                 applied: state.applied.concat(state.list.filter(client => client.state === 'selected')),
                 list: state.list.map(client => {
-                    if(client.state === 'selected') {
-                        client.state = 'applied';
-                    }
+                    client.state = (client.state === 'selected') ? 'applied' : client.state;
                     return client;
                 })
             });
         }
+
         case SelectClientsActionTypes.APPLY_DESELECTED_CLIENTS: {
             return Object.assign({}, state, {
                 applied: state.applied.filter(client => client.state === 'applied'),
@@ -31,26 +51,61 @@ export const selectClients = (state:any = initialState, action:SelectClientsActi
                 })
             });
         }
-        case SelectClientsActionTypes.UPDATE_CLIENT_STATE: {
-            return Object.assign({}, state, {
-                list: state.list.map(item => {
-                    if(item.id === action.clientId) {
-                        item.state = action.state;
-                    }
-                    return item;
-                }),
-                applied: state.applied.map(item => {
-                    if(item.id === action.clientId) {
-                        item.state = action.state;
-                    }
-                    return item;
-                })
 
-            });
+        case SelectClientsActionTypes.UPDATE_CLIENT: {
+            let newState = getNewState(action.clientState);
+
+            let stateChanges = {};
+
+            let allAppliedClientsIds = state.list.filter(item => item.state === 'applied').map(item => item.id);
+
+            // return if view is 'all' and current client is already 'applied'
+            if(action.view === 'all' && allAppliedClientsIds.indexOf(action.clientId) >= 0) {
+                return Object.assign({}, state, stateChanges);
+            }
+
+            // only update state when the client item's state changes
+            if(newState !== undefined) {
+                stateChanges = {
+                    list: state.list.map(item => {
+                        item.state = item.id === action.clientId ? newState : item.state;
+                        return item;
+                    }),
+                    applied: state.applied.map(item => {
+                        item.state = item.id === action.clientId ? newState : item.state;
+                        return item;
+                    })
+                };
+            }
+            return Object.assign({}, state, stateChanges);
+
+            /**
+             *
+             * @param client
+             * @returns {string} new client state or undefined if the state should not change
+             */
+            function getNewState(clientState) {
+                var newClientState;
+                if(action.view === 'all') {
+                    if(clientState == "") {
+                        newClientState = 'selected';
+                    } else if(clientState === 'selected') {
+                        newClientState = '';
+                    }
+                } else {
+                    if(clientState === 'applied') {
+                        newClientState = 'deselected';
+                    } else if(clientState === 'deselected') {
+                        newClientState = 'applied';
+                    }
+                }
+                return newClientState;
+            }
         }
 
         case SelectClientsActionTypes.REQUEST_CLIENTS:
             return Object.assign({}, state, {isFetching: true});
+
         case SelectClientsActionTypes.RECEIVE_CLIENTS:
             return Object.assign({}, state, {
                 isFetching: false,
