@@ -34,9 +34,9 @@ export class StatementsPage {
     this.statements$ = _appStore.select(contentListSelector);
     this.statementsCount$ = _appStore.select(contentTotalSelector);
 
-    this._appStore.subscribe((state) => {
-      console.log(state);
-    });
+    // this._appStore.subscribe((state) => {
+    //   console.log(state);
+    // });
 
   }
 

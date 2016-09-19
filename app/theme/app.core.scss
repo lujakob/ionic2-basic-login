@@ -29,3 +29,68 @@
 .toolbar-button {
     margin:0 10px;
 }
+
+.client-select-modal {
+    padding-left:0;
+    padding-right:0;
+    .client-id {
+        display:inline-block;
+        width:60px;
+    }
+}
+.client-select-modal-list {
+
+    .client-title {
+        display:inline-block;
+    }
+
+    .item {
+        .item-inner {
+            padding-left:16px;
+            padding-right:16px;
+        }
+        &.depth-level-1 {
+            .client-title {
+                padding-left:20px;
+            }
+        }
+        &.state-selected {
+            background-color: turquoise;
+        }
+        &.state-applied {
+            background-color: darkturquoise;
+        }
+        &.state-deselected {
+            background-color: mediumturquoise;
+        }
+
+    }
+}
+
+.modal-wrapper {
+    background-color:white;
+}
+.client-select-modal-component {
+    .client-select-modal {
+        margin-top:130px;
+        height:calc(100% - 130px - 70px);
+
+        scroll-content {
+            margin-top:0 !important;
+        }
+    }
+    .ion-segment-outside {
+        margin-top:70px;
+    }
+    .modal-button-bottom {
+        position: absolute;
+        width:100%;
+        bottom:0;
+        padding:10px 20px;
+        button {
+            width:100%;
+        }
+    }
+}
+
+

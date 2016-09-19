@@ -127,12 +127,15 @@ var functions = {
     var sortby = params.sortby && params.sortby.length > 0 ? params.sortby : defaultSortby;
     var data = require('../../www/data/clientsData.json');
 
-    // clientId filter
-    // if (clientId > 0) {
-    //   data = _.filter(data, function(item) {
-    //     return item.clientId == clientId
-    //   });
-    // }
+    // flatMap to _source
+    data = _.flatMap(data, function(item) { return item._source});
+    // take a few for testing
+    // data = _.take(data, 3);
+
+    // pick needed properties
+    data = _.map(data, function(item) {
+      return _.pick(item, ['id', 'clientName', 'currencyId', 'payeeId', 'payee', 'depth'])
+    });
 
     total = data.length;
 
