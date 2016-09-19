@@ -5,7 +5,9 @@ export const initialState = {isFetching: '?', selectedClient: 0, list: [], appli
 export const selectClients = (state:any = initialState, action:SelectClientsAction = {type:"?"}) => {
     switch (action.type) {
         case SelectClientsActionTypes.SELECT_CLIENT: {
-            return Object.assign({}, state, {selectedClient: action.clientId });
+            let newState = Object.assign({}, state, {selectedClient: action.clientId });
+            console.log(newState);
+            return newState;
         }
         case SelectClientsActionTypes.APPLY_SELECTED_CLIENTS: {
             return Object.assign({}, state, {

@@ -10,13 +10,13 @@ import { ContentActions } from '../actions/content.actions';
   providers: []
 })
 export class ClientListButton {
-  private client: number = 0;
-  constructor(
-    public alertCtrl: AlertController,
-    private _appStore: AppStore,
-    private _selectClientsActions: SelectClientsActions,
-    private _contentActions: ContentActions) {
-  }
+    private client: number = 0;
+    constructor(
+        public alertCtrl: AlertController,
+        private _appStore: AppStore,
+        private _selectClientsActions: SelectClientsActions,
+        private _contentActions: ContentActions) {
+    }
 
   /**
    * create and show alert component

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Platform, NavParams, ViewController } from 'ionic-angular';
+import { TruncatePipe } from '../pipes/truncate';
 import { AppStore } from 'angular2-redux';
 import { selectedClientsListSelector, appliedClientsListSelector } from '../reducers/select-clients.reducer';
 import { SelectClientsActions }from '../actions/select-clients.actions';
@@ -25,12 +26,15 @@ import { SelectClientsActions }from '../actions/select-clients.actions';
         Selected clients
     </ion-segment-button>
 </ion-segment>
+<div class="client-select-toolbar">
+    <button (click)="deselectAll()">Deselect all</button>
+</div>
 <ion-content class="client-select-modal">
     <div [ngSwitch]="segmentView" class="client-select-modal-list">
         <div *ngSwitchCase="'all'">
             <ion-list>
                 <ion-item *ngFor="let client of allClients$ | async" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)">
-                    <h2><span class="client-id">{{client.id}}</span><span class="client-title">{{client.clientName}}{{client.state}}</span></h2>
+                    <h2><span class="client-id">{{client.id}}</span><span class="client-title">{{client.clientName | truncate : 10}}($ID{{client.currencyId}})</span></h2>
                 </ion-item>
             </ion-list>
         </div>
@@ -46,7 +50,8 @@ import { SelectClientsActions }from '../actions/select-clients.actions';
 <div class="modal-button-bottom">
     <button secondary (click)="applySelect()">Apply</button>
 </div>
-`
+`,
+    pipes:[TruncatePipe]
 })
 export class ClientSelectModalComponent {
     private allClients$;
