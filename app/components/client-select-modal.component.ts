@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Platform, NavParams, ViewController } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { Platform, NavParams, ViewController, Content } from 'ionic-angular';
 import { TruncatePipe } from '../pipes/truncate';
 import { AppStore } from 'angular2-redux';
 import { selectedClientsListSelector, appliedClientsListSelector } from '../reducers/select-clients.reducer';
@@ -33,12 +33,17 @@ import { SelectClientsActions }from '../actions/select-clients.actions';
 <ion-content class="client-select-modal">
     <div [ngSwitch]="segmentView" class="client-select-modal-list" style="height:100%;">
         <div *ngSwitchCase="'all'" style="height:100%;">
-        	<ion-list [virtualScroll]="allClients$">
-		        <ion-item *virtualItem="let client" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)">
-                
+        	<ion-list [virtualScroll]="allClients$" [headerFn]="myHeaderFn">
+		        <ion-item *virtualItem="let client" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)" [virtualTrackBy]="trackBy">
                     <h2><span class="client-id">{{client.id}}</span><span class="client-title">{{client.clientName | truncate : 10}}($ID{{client.currencyId}}){{client.state}}</span></h2>
                 </ion-item>
+                <ion-item-divider *virtualHeader="let header">
+                    Header: {{ header }}
+                </ion-item-divider>
             </ion-list>
+            <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+                <ion-infinite-scroll-content></ion-infinite-scroll-content>
+            </ion-infinite-scroll>
         </div>
         <div *ngSwitchCase="'applied'">
             <ion-list>
@@ -50,6 +55,7 @@ import { SelectClientsActions }from '../actions/select-clients.actions';
     </div>
 </ion-content>
 <div class="modal-button-bottom">
+    <!--<button secondary (click)="reload()">Reload</button>-->
     <button secondary (click)="applySelect()">Apply</button>
 </div>
 `,
@@ -61,6 +67,8 @@ export class ClientSelectModalComponent {
 
     public segmentView:string = 'all';
     public test = true;
+
+    @ViewChild(Content) content: Content;
 
     constructor(public platform:Platform,
                 public params:NavParams,
@@ -89,7 +97,8 @@ export class ClientSelectModalComponent {
             'depth-level-2': item.depth == 2,
             'state-selected': item.state == 'selected',
             'state-deselected': item.state == 'deselected',
-            'state-applied': item.state == 'applied'
+            'state-applied': item.state == 'applied',
+            'big-item': item.class === 'big-item'
         };
         return classes;
     }
@@ -117,5 +126,28 @@ export class ClientSelectModalComponent {
         } else {
             this._appStore.dispatch((this._clientActions.applyDeselectedClients()));
         }
+    }
+
+    myHeaderFn(record, recordIndex, records) {
+        if(recordIndex === records.length - 1) {
+            console.log("end");
+        }
+
+        if (recordIndex % 20 === 0) {
+            return 'Header ' + recordIndex;
+        }
+        return null;
+    }
+
+    reload() {
+        console.log("reload");
+        this.content.scrollToTop(0);
+        this._appStore.dispatch(this._clientActions.fetchClients(100));
+    }
+
+    doInfinite() {
+        this.content.scrollToTop(0);
+        this._appStore.dispatch(this._clientActions.fetchClients(100));
+        console.log("infinite");
     }
 }

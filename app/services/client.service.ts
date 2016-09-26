@@ -27,4 +27,32 @@ export class ClientService {
     return this._http.get(BASE_URL + path)
       .map<IAPIClients>(res => res.json());
   }
+
+
+    //
+    // createAuthorizationHeader(headers:Headers) {
+    //     let username = "user";
+    //     let password = "password";
+    //
+    //     headers.append('Authorization', 'Basic ' +
+    //         btoa(username + ':' + password));
+    // }
+    //
+    // /**
+    //  *
+    //  * @param path
+    //  * @returns {Observable<R>}
+    //  */
+    // getClients(path:string = ''):Observable<IAPIClients> {
+    //
+    //     let headers = new Headers();
+    //     this.createAuthorizationHeader(headers);
+    //
+    //     return this._http.get(BASE_URL + '?count=500', {
+    //         headers: headers
+    //     }).map<IAPIClients>(res => {
+    //         return res.json();
+    //     });
+    // }
+
 }

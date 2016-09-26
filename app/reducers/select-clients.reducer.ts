@@ -111,7 +111,8 @@ export const selectClients = (state:any = initialState, action:SelectClientsActi
         case SelectClientsActionTypes.RECEIVE_CLIENTS:
             return Object.assign({}, state, {
                 isFetching: false,
-                list: state.nextOffset === 0 ? action.list : state.list.concat(action.list),
+                list: action.list,
+                // list: state.nextOffset === 0 ? action.list : state.list.concat(action.list),
                 nextOffset: action.nextOffset,
                 total: action.total
             });

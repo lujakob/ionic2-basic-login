@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^2.2.33",
+    "@types/node": "^6.0.41",
     "browserify": "13.0.0",
     "browserify-istanbul": "2.0.0",
     "del": "2.2.0",

@@ -116,7 +116,7 @@ var functions = {
     },
 
     getClients: function(req, res) {
-        var limit = 50000,
+        var limit = 100,
             offset = 0,
             defaultSortby = 'clientName',
             nextOffset,
@@ -173,6 +173,10 @@ var functions = {
         if(limit > 0) {
             data = data.slice(offset, (data.length > (offset + limit) ? offset + limit : data.length));
         }
+
+        // for (var i = 0, len = data.length; i < len; i++) {
+        //     data[i].class = (i % 3) === 0 ? 'big-item' : '';
+        // }
 
         // simulate network delay
         setTimeout(function() {
