@@ -13,6 +13,8 @@ export type IAPIContent = {
 
 @Injectable()
 export class ContentService {
+    public clientId: number = 0;
+
   constructor(private _http:Http) {}
 
   /**
@@ -23,5 +25,13 @@ export class ContentService {
   getContent(path:string = ''):Observable<IAPIContent> {
     return this._http.get(BASE_URL + path)
       .map<IAPIContent>(res => res.json());
+  }
+
+  setClientId(id) {
+      this.clientId = id;
+  }
+
+  getClientId() {
+      return this.clientId;
   }
 }

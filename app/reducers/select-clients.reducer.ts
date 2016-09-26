@@ -11,6 +11,10 @@ export const selectClients = (state:any = initialState, action:SelectClientsActi
         }
 
         case SelectClientsActionTypes.SELECT_ALL_CLIENTS: {
+            var newObj = Object.assign({}, state, {isFetching: true, list: [1]});
+
+
+
             return Object.assign({}, state, {
                 list: state.list.map(item => {
                     if (item.state === '') {
@@ -54,9 +58,7 @@ export const selectClients = (state:any = initialState, action:SelectClientsActi
 
         case SelectClientsActionTypes.UPDATE_CLIENT: {
             let newState = getNewState(action.clientState);
-
             let stateChanges = {};
-
             let allAppliedClientsIds = state.list.filter(item => item.state === 'applied').map(item => item.id);
 
             // return if view is 'all' and current client is already 'applied'

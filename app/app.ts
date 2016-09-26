@@ -20,67 +20,74 @@ import { AuthService } from './services/auth/auth';
 import { ContentService } from './services/content.service';
 import { ClientService } from './services/client.service';
 
+// my logger middleware
+const loggerMiddleware = store => next => action => {
+    console.log('dispatching', action);
+    return next(action);
+};
+
 const appStoreFactory = createAppStoreFactoryWithOptions({
-  reducers,
-  debug:true
+    reducers,
+    additionalMiddlewares:[loggerMiddleware],
+    debug:true
 });
 
 @Component({
-  templateUrl: 'build/app.html',
-  directives: [ClientListButton, ClientSelectButton]
+    templateUrl: 'build/app.html',
+    directives: [ClientListButton, ClientSelectButton]
 })
 export class MyApp {
-  @ViewChild('myNav') nav: Nav;
+    @ViewChild('myNav') nav: Nav;
 
-  // make HelloIonicPage the root (or first) page
-  rootPage: any;
-  pages: Array<{title: string, component: any}>;
+    // make HelloIonicPage the root (or first) page
+    rootPage: any;
+    pages: Array<{title: string, component: any}>;
 
-  constructor(
-    public platform: Platform,
-    public menu: MenuController,
-    public service: AuthService
-  ) {
+    constructor(
+        public platform: Platform,
+        public menu: MenuController,
+        public service: AuthService
+    ) {
 
-    this.initializeAuthGuard();
-    this.initializeApp();
-  }
-
-  initializeApp() {
-    this.platform.ready().then(() => {
-      // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
-      StatusBar.styleDefault();
-    });
-  }
-
-  initializeAuthGuard() {
-    if(this.service.authenticated()) {
-      this.rootPage = TabsPage;
-    } else {
-      this.rootPage = ProfilePage;
+        this.initializeAuthGuard();
+        this.initializeApp();
     }
-  }
-  openPage(page) {
-    // close the menu when clicking a link from the menu
-    this.menu.close();
-    // navigate to the new page if it is not the current page
-    this.nav.setRoot(page.component);
-  }
+
+    initializeApp() {
+        this.platform.ready().then(() => {
+            // Okay, so the platform is ready and our plugins are available.
+            // Here you can do any higher level native things you might need.
+            StatusBar.styleDefault();
+        });
+    }
+
+    initializeAuthGuard() {
+        if(this.service.authenticated()) {
+            this.rootPage = TabsPage;
+        } else {
+            this.rootPage = ProfilePage;
+        }
+    }
+    openPage(page) {
+        // close the menu when clicking a link from the menu
+        this.menu.close();
+        // navigate to the new page if it is not the current page
+        this.nav.setRoot(page.component);
+    }
 }
 
 ionicBootstrap(MyApp, [
-  AuthService,
-  ContentService,
-  ClientService,
-  provide(AppStore, { useFactory: appStoreFactory }),
-  FilmActions,  CounterActions, SelectClientsActions, ContentActions,
-  provide(AuthHttp, {
-    useFactory: (http) => {
-      return new AuthHttp(new AuthConfig, http);
-    },
-    deps: [Http]
-  }),
-  provide(PLATFORM_DIRECTIVES, {useValue: [ClientListButton, ClientSelectButton], multi: true})
+    AuthService,
+    ContentService,
+    ClientService,
+    provide(AppStore, { useFactory: appStoreFactory }),
+    FilmActions,  CounterActions, SelectClientsActions, ContentActions,
+    provide(AuthHttp, {
+        useFactory: (http) => {
+            return new AuthHttp(new AuthConfig, http);
+        },
+        deps: [Http]
+    }),
+    provide(PLATFORM_DIRECTIVES, {useValue: [ClientListButton, ClientSelectButton], multi: true})
 ]);
 

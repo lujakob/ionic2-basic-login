@@ -116,7 +116,7 @@ var functions = {
     },
 
     getClients: function(req, res) {
-        var limit = 50,
+        var limit = 50000,
             offset = 0,
             defaultSortby = 'clientName',
             nextOffset,

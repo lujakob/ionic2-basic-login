@@ -31,10 +31,11 @@ import { SelectClientsActions }from '../actions/select-clients.actions';
     <button clear (click)="selectAll()">Select all</button>
 </div>
 <ion-content class="client-select-modal">
-    <div [ngSwitch]="segmentView" class="client-select-modal-list">
-        <div *ngSwitchCase="'all'">
-            <ion-list>
-                <ion-item *ngFor="let client of allClients$ | async" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)">
+    <div [ngSwitch]="segmentView" class="client-select-modal-list" style="height:100%;">
+        <div *ngSwitchCase="'all'" style="height:100%;">
+        	<ion-list [virtualScroll]="allClients$">
+		        <ion-item *virtualItem="let client" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)">
+                
                     <h2><span class="client-id">{{client.id}}</span><span class="client-title">{{client.clientName | truncate : 10}}($ID{{client.currencyId}}){{client.state}}</span></h2>
                 </ion-item>
             </ion-list>
@@ -66,14 +67,19 @@ export class ClientSelectModalComponent {
                 public viewCtrl:ViewController,
                 private _appStore:AppStore,
                 private _clientActions:SelectClientsActions) {
-        this.allClients$ = _appStore.select(selectedClientsListSelector);
+        // this.allClients$ = _appStore.select(selectedClientsListSelector);
         this.appliedClients$ = _appStore.select(appliedClientsListSelector);
-        // _appStore.select(selectedClientsListSelector).subscribe((data) => console.log("all", data));
+        _appStore.select(selectedClientsListSelector).subscribe((data) => {
+            console.log("all", data);
+            this.allClients$ = data;
+        });
         // _appStore.select(appliedClientsListSelector).subscribe((data) => console.log("applied", data));
+        // _appStore.select(state => state).subscribe((state) => console.log("state changed applied", state));
     }
 
     ionViewWillEnter() {
         this._appStore.dispatch(this._clientActions.fetchClients());
+        // console.log("get state on viewWillEnter", this._appStore.getState());
     }
 
     setClasses(item) {
@@ -101,6 +107,7 @@ export class ClientSelectModalComponent {
     }
 
     updateClientStatus(client) {
+        console.log("update client", client);
         this._appStore.dispatch(this._clientActions.updateClientState(client.id, client.state, this.segmentView));
     }
 
@@ -110,6 +117,5 @@ export class ClientSelectModalComponent {
         } else {
             this._appStore.dispatch((this._clientActions.applyDeselectedClients()));
         }
-
     }
 }

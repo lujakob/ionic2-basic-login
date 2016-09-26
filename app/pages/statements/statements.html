@@ -10,10 +10,8 @@
 
 <ion-content padding>
 	<p>Total statements: {{statementsCount$ | async}}</p>
-	<ion-list>
-		<ion-item *ngFor="let item of statements$ | async">{{item.title}}, ID:{{item.id}} (client-id: {{item.clientId}}) <span class="statement-item-right">{{item.royalties}}</span></ion-item>
+	<ion-list [virtualScroll]="statements$">
+		<ion-item *virtualItem="let item">{{item.title}}, ID:{{item.id}} (client-id: {{item.clientId}}) <span class="statement-item-right">{{item.royalties}}</span></ion-item>
 	</ion-list>
-	<ion-infinite-scroll #infinite (ionInfinite)="doInfinite($event)">
-		<ion-infinite-scroll-content></ion-infinite-scroll-content>
-	</ion-infinite-scroll>
+
 </ion-content>

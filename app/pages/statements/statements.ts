@@ -30,8 +30,13 @@ export class StatementsPage {
         private _contentActions: ContentActions,
         private _appStore: AppStore
     ) {
+        this._appStore.dispatch(this._contentActions.fetchContent());
 
-        this.statements$ = _appStore.select(contentListSelector);
+        //this.statements$ = _appStore.select(contentListSelector);
+        _appStore.select(contentListSelector).subscribe(data => {
+            this.statements$ = data;
+            // console.log(this.statements$);
+        });
         this.statementsCount$ = _appStore.select(contentTotalSelector);
 
     // this._appStore.subscribe((state) => {
@@ -41,9 +46,9 @@ export class StatementsPage {
     }
 
     ionViewLoaded() {
-        // setTimeout(() => {
-        // this.clientSelectButton.openModal();
-        // }, 500);
+        setTimeout(() => {
+        this.clientSelectButton.openModal();
+        }, 500);
     }
 
     /**

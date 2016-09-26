@@ -153,6 +153,8 @@ export class SelectClientsActions extends Actions {
             return Object.assign({}, client, {state: ''});
         })});
 
+        //data.data[1].status = 'selected';
+
         return data;
     }
 }

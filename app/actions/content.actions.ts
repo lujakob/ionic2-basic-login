@@ -39,6 +39,7 @@ export class ContentActions extends Actions {
   fetchContent(clientId = 0, offset = 0) {
     return (dispatch) => {
       let path = '/?1=1' + (clientId > 0 ? '&clientId=' + clientId : '') + (offset > 0 ? '&offset=' + offset : '');
+
       dispatch(this.requestContent());
 
       this._contentService.getContent(path)
