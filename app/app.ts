@@ -8,6 +8,7 @@ import { TabsPage } from './pages/tabs/tabs';
 import { AuthHttp, AuthConfig } from 'angular2-jwt';
 import { ClientListButton } from './components/client-list-button.component';
 import { ClientSelectButton } from './components/client-select-button.component';
+import { BmgInfiniteScrollContent } from './components/bmg-infinite-scroll-content.component';
 
 import { AppStore, createAppStoreFactoryWithOptions } from "angular2-redux";
 import reducers from "./reducers/app.reducer";
@@ -34,7 +35,7 @@ const appStoreFactory = createAppStoreFactoryWithOptions({
 
 @Component({
     templateUrl: 'build/app.html',
-    directives: [ClientListButton, ClientSelectButton]
+    directives: [ClientListButton, ClientSelectButton, BmgInfiniteScrollContent]
 })
 export class MyApp {
     @ViewChild('myNav') nav: Nav;
@@ -80,14 +81,14 @@ ionicBootstrap(MyApp, [
     AuthService,
     ContentService,
     ClientService,
-    provide(AppStore, { useFactory: appStoreFactory }),
     FilmActions,  CounterActions, SelectClientsActions, ContentActions,
-    provide(AuthHttp, {
+    {provide: AppStore, useFactory: appStoreFactory },
+    {provide: AuthHttp,
         useFactory: (http) => {
             return new AuthHttp(new AuthConfig, http);
         },
         deps: [Http]
-    }),
-    provide(PLATFORM_DIRECTIVES, {useValue: [ClientListButton, ClientSelectButton], multi: true})
+    },
+    {provide: PLATFORM_DIRECTIVES, useValue: [ClientListButton, ClientSelectButton, BmgInfiniteScrollContent], multi: true}
 ]);
 

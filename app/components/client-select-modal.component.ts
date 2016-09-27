@@ -1,9 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
-import { Platform, NavParams, ViewController, Content } from 'ionic-angular';
+import { Platform, NavParams, ViewController, Content, LoadingController } from 'ionic-angular';
 import { TruncatePipe } from '../pipes/truncate';
 import { AppStore } from 'angular2-redux';
-import { selectedClientsListSelector, appliedClientsListSelector } from '../reducers/select-clients.reducer';
+import { selectedClientsListSelector, appliedClientsListSelector, isFetchingSelector } from '../reducers/select-clients.reducer';
 import { SelectClientsActions }from '../actions/select-clients.actions';
+import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
 
 @Component({
     template: `
@@ -41,9 +42,9 @@ import { SelectClientsActions }from '../actions/select-clients.actions';
                     Header: {{ header }}
                 </ion-item-divider>
             </ion-list>
-            <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
-                <ion-infinite-scroll-content></ion-infinite-scroll-content>
-            </ion-infinite-scroll>
+        	<bmg-infinite-scroll (ionInfinite)="doInfinite($event)">
+        	    <bmg-infinite-scroll-content></bmg-infinite-scroll-content>
+            </bmg-infinite-scroll>
         </div>
         <div *ngSwitchCase="'applied'">
             <ion-list>
@@ -59,14 +60,19 @@ import { SelectClientsActions }from '../actions/select-clients.actions';
     <button secondary (click)="applySelect()">Apply</button>
 </div>
 `,
-    pipes:[TruncatePipe]
+    pipes:[TruncatePipe],
+    directives: [BmgInfiniteScroll]
 })
 export class ClientSelectModalComponent {
     private allClients$;
     private appliedClients$;
 
+    private loading;
+
+
     public segmentView:string = 'all';
     public test = true;
+
 
     @ViewChild(Content) content: Content;
 
@@ -74,6 +80,7 @@ export class ClientSelectModalComponent {
                 public params:NavParams,
                 public viewCtrl:ViewController,
                 private _appStore:AppStore,
+                private loadingCtrl: LoadingController,
                 private _clientActions:SelectClientsActions) {
         // this.allClients$ = _appStore.select(selectedClientsListSelector);
         this.appliedClients$ = _appStore.select(appliedClientsListSelector);
@@ -81,6 +88,16 @@ export class ClientSelectModalComponent {
             console.log("all", data);
             this.allClients$ = data;
         });
+
+        _appStore.select(isFetchingSelector).subscribe((isFetching) => {
+            console.log("isFetching", isFetching);
+            // if(isFetching === false && !!this.content) {
+            //     console.log("scroll to middle");
+            //     this.content.scrollTo(0, 2000, 0);
+            // }
+        });
+
+
         // _appStore.select(appliedClientsListSelector).subscribe((data) => console.log("applied", data));
         // _appStore.select(state => state).subscribe((state) => console.log("state changed applied", state));
     }
@@ -129,25 +146,31 @@ export class ClientSelectModalComponent {
     }
 
     myHeaderFn(record, recordIndex, records) {
-        if(recordIndex === records.length - 1) {
-            console.log("end");
-        }
-
         if (recordIndex % 20 === 0) {
             return 'Header ' + recordIndex;
         }
         return null;
     }
 
-    reload() {
-        console.log("reload");
-        this.content.scrollToTop(0);
-        this._appStore.dispatch(this._clientActions.fetchClients(100));
-    }
 
-    doInfinite() {
-        this.content.scrollToTop(0);
-        this._appStore.dispatch(this._clientActions.fetchClients(100));
-        console.log("infinite");
+    doInfinite(infiniteScroll) {
+        console.log("do infinite", infiniteScroll);
+
+        if(infiniteScroll.arrivedAt === 'bottom') {
+            console.log(this._appStore.getState().selectClients.nextOffset);
+            this._appStore.dispatch(this._clientActions.fetchClients(this._appStore.getState().selectClients.nextOffset));
+            setTimeout(() => {
+                //infiniteScroll.complete();
+                infiniteScroll.disableBottom();
+            }, 1000);
+        }
+        if(infiniteScroll.arrivedAt === 'top') {
+            setTimeout(() => {
+                infiniteScroll.complete();
+                infiniteScroll.disableTop();
+            }, 1000);
+        }
+
+
     }
 }

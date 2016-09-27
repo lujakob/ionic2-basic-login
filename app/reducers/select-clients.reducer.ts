@@ -1,7 +1,7 @@
 import { SelectClientsActionTypes, SelectClientsAction } from '../actions/select-clients.actions';
 import * as _ from 'lodash';
 
-export const initialState = {isFetching: '?', selectedClient: 0, list: [], applied: [], nextOffset: 0};
+export const initialState = {isFetching: false, selectedClient: 0, list: [], applied: [], nextOffset: 0};
 
 export const selectClients = (state:any = initialState, action:SelectClientsAction = {type:"?"}) => {
     switch (action.type) {
@@ -129,4 +129,5 @@ export const selectClients = (state:any = initialState, action:SelectClientsActi
 export const selectedClientSelector = state => state.selectClients.selectedClient;
 export const selectedClientsListSelector = state => state.selectClients.list;
 export const appliedClientsListSelector = state => state.selectClients.applied;
+export const isFetchingSelector = state => state.selectClients.isFetching;
 
