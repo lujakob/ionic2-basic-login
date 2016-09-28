@@ -1,8 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild,ChangeDetectionStrategy } from '@angular/core';
 import { Platform, NavParams, ViewController, NavController, Content, LoadingController } from 'ionic-angular';
 import { TruncatePipe } from '../pipes/truncate';
 import { AppStore } from 'angular2-redux';
-import { allClientsSelector, selectedClientsSelector, isFetchingSelector } from '../reducers/clients.reducer';
+import { allClientsSelector, selectedClientsSelector, isFetchingSelector, orderBySelector } from '../reducers/clients.reducer';
 import { ClientsActions }from '../actions/clients.actions';
 import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
 
@@ -27,12 +27,13 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
         Selected clients
     </ion-segment-button>
 </ion-segment>
-<!--
+
 <div class="client-select-toolbar">
-    <button clear (click)="deselectAll()">Deselect all</button>
-    <button clear (click)="selectAll()">Select all</button>
+    <button clear (click)="orderBy('id')" class="btn-order-by-id btn-order-by" [ngClass]="setOrderByClasses('id')">Id</button>
+    <button clear (click)="orderBy('name')" class="btn-order-by-name btn-order-by" [ngClass]="setOrderByClasses('name')">Name</button>
+    <button clear (click)="selectAll()" class="btn-select-all">Select all</button>
 </div>
--->
+
 <ion-content class="client-select-modal">
     <div [ngSwitch]="segmentView" class="client-select-modal-list" style="height:100%;">
         <div *ngSwitchCase="'all'" style="height:100%;">
@@ -61,13 +62,16 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
 `,
     pipes:[TruncatePipe],
     directives: [BmgInfiniteScroll]
+    // changeDetection:ChangeDetectionStrategy.OnPush
+
 })
 export class ClientSelectModalComponent {
     private allClients;
     private selectedClients$;
 
     public segmentView:string = 'all';
-    public test = true;
+    public orderByNameDirection:string = '';
+    public orderByIdDirection:string = '';
 
 
     @ViewChild(Content) content: Content;
@@ -89,6 +93,39 @@ export class ClientSelectModalComponent {
         _appStore.select(state => state.clients).subscribe((clients) => {
             console.log("state.clients", clients);
         });
+
+        _appStore.select(orderBySelector).subscribe((orderBy) => {
+            if(orderBy.field === 'id') {
+                this.orderByNameDirection = 'default';
+                this.orderByIdDirection = orderBy.direction;
+            } else {
+                this.orderByIdDirection = 'default';
+                this.orderByNameDirection = orderBy.direction;
+            }
+        });
+
+
+    }
+
+    setOrderByClasses(field) {
+        let classes;
+        console.log("orderBy");
+
+        if(field === 'id') {
+            classes = {
+                'order-by-default': this.orderByIdDirection === 'default',
+                'order-by-asc': this.orderByIdDirection === 'asc',
+                'order-by-desc': this.orderByIdDirection === 'desc'
+            };
+        } else {
+            classes = {
+                'order-by-default': this.orderByNameDirection === 'default',
+                'order-by-asc': this.orderByNameDirection === 'asc',
+                'order-by-desc': this.orderByNameDirection === 'desc'
+            };
+        }
+
+        return classes;
     }
 
     ionViewWillEnter() {
@@ -137,6 +174,10 @@ export class ClientSelectModalComponent {
         // } else {
         //     this._appStore.dispatch((this._clientActions.applyDeselectedClients()));
         // }
+    }
+
+    orderBy(field) {
+        this._appStore.dispatch(this._clientActions.setOrderBy(field));
     }
 
     doInfinite(infiniteScroll) {

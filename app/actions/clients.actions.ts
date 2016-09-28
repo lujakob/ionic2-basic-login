@@ -4,6 +4,7 @@ import { ClientService } from '../services/client.service';
 
 type Types = 'SELECT_CLIENT | REQUEST_CLIENTS | RECEIVE_CLIENTS | RESET_NEXT_OFFSET | UPDATE_CLIENT | UPDATE_CLIENT_STATE | APPLY_SELECTED_CLIENTS | APPLY_DESELECTED_CLIENTS | SELECT_ALL_CLIENTS | DESELECT_ALL_CLIENTS';
 export const ClientsActionTypes = {
+    SET_ORDER_BY: 'SET_ORDER_BY' as Types,
     SELECT_CLIENT: 'SELECT_CLIENT' as Types,
     REQUEST_CLIENTS: 'REQUEST_CLIENTS' as Types,
     RECEIVE_CLIENTS: 'RECEIVE_CLIENTS' as Types,
@@ -26,6 +27,8 @@ export interface ClientsAction {
     state?;
     clientState?;
     view?;
+    orderByField?;
+    orderByDirection?;
 }
 
 // export interface ContentActionsInterface {
@@ -138,9 +141,17 @@ export class ClientsActions extends Actions {
         }
     }
 
-    fetchClients( offset = 0) {
+    setOrderBy(orderByField) {
+        return {
+            type: ClientsActionTypes.SET_ORDER_BY,
+            orderByField: orderByField
+        }
+    }
+
+    fetchClients( offset = 0, orderByField = '') {
         return (dispatch) => {
             let path = '/?1=1' + (offset > 0 ? '&offset=' + offset : '');
+            //let path = '/?1=1' + (offset > 0 ? '&offset=' + offset : '') + (orderByField !== '' ? '&offset=' + offset : ''' : '');
             dispatch(this.requestClients());
 
             this.clientService.getClients(path)

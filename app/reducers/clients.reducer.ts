@@ -9,7 +9,8 @@ export const initialState = {
     deselected: [],
     applied: [],
     inList: [],
-    nextOffset: 0
+    nextOffset: 0,
+    orderBy: {field: 'name', direction: 'asc'}
 };
 
 export const clients = (state:any = initialState, action:ClientsAction = {type:"?"}) => {
@@ -150,6 +151,23 @@ export const clients = (state:any = initialState, action:ClientsAction = {type:"
             return Object.assign({}, state, stateChanges);
         }
 
+        case ClientsActionTypes.SET_ORDER_BY: {
+            return Object.assign({}, state, {
+                orderBy: {
+                    field: action.orderByField,
+                    direction: (() => {
+                        let newDirection:string;
+                        if(action.orderByField === state.orderBy.field) {
+                            newDirection = state.orderBy.direction === 'asc' ? 'desc' : 'asc';
+                        } else {
+                            newDirection = 'asc';
+                        }
+                        return newDirection;
+                    })()
+                }
+            })
+        }
+
         default:
             return state;
     }
@@ -186,4 +204,5 @@ export const allClientsSelector = state => state.clients.allClients;
 export const selectedClientsSelector = state => state.clients.selectedClients;
 export const appliedClientsSelector = state => state.clients.applied;
 export const isFetchingSelector = state => state.clients.isFetching;
+export const orderBySelector = state => state.clients.orderBy;
 
