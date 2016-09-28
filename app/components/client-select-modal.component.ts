@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { Platform, NavParams, ViewController, Content, LoadingController } from 'ionic-angular';
+import { Platform, NavParams, ViewController, NavController, Content, LoadingController } from 'ionic-angular';
 import { TruncatePipe } from '../pipes/truncate';
 import { AppStore } from 'angular2-redux';
 import { allClientsSelector, selectedClientsSelector, isFetchingSelector } from '../reducers/clients.reducer';
@@ -19,7 +19,7 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
         </ion-buttons>
     </ion-toolbar>
 </ion-header>
-<ion-segment [(ngModel)]="segmentView" class="ion-segment-outside">
+<ion-segment [(ngModel)]="segmentView" class="ion-segment-outside" padding>
     <ion-segment-button value="all">
         All clients
     </ion-segment-button>
@@ -27,10 +27,12 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
         Selected clients
     </ion-segment-button>
 </ion-segment>
+<!--
 <div class="client-select-toolbar">
     <button clear (click)="deselectAll()">Deselect all</button>
     <button clear (click)="selectAll()">Select all</button>
 </div>
+-->
 <ion-content class="client-select-modal">
     <div [ngSwitch]="segmentView" class="client-select-modal-list" style="height:100%;">
         <div *ngSwitchCase="'all'" style="height:100%;">
@@ -52,10 +54,10 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
         </div>
     </div>
 </ion-content>
-<div class="modal-button-bottom">
-    <!--<button secondary (click)="reload()">Reload</button>-->
-    <button secondary (click)="applySelect()">Apply</button>
-</div>
+<ion-footer class="toolbar-footer">
+    <button secondary (click)="cancel()" clear class="btn--50">Cancel</button>
+    <button secondary (click)="applySelect()" clear class="btn--50">Apply</button>
+</ion-footer>
 `,
     pipes:[TruncatePipe],
     directives: [BmgInfiniteScroll]
@@ -73,6 +75,7 @@ export class ClientSelectModalComponent {
     constructor(public platform:Platform,
                 public params:NavParams,
                 public viewCtrl:ViewController,
+                public navCtrl: NavController,
                 private _appStore:AppStore,
                 private loadingCtrl: LoadingController,
                 private _clientActions:ClientsActions) {
@@ -81,6 +84,10 @@ export class ClientSelectModalComponent {
         this.selectedClients$ = _appStore.select(selectedClientsSelector);
         _appStore.select(allClientsSelector).subscribe((data) => {
             this.allClients = data;
+        });
+
+        _appStore.select(state => state.clients).subscribe((clients) => {
+            console.log("state.clients", clients);
         });
     }
 
@@ -118,12 +125,18 @@ export class ClientSelectModalComponent {
         this._appStore.dispatch(this._clientActions.updateClientState(client.id, client.state, this.segmentView));
     }
 
+    cancel() {
+        this.navCtrl.pop();
+    }
+
     applySelect() {
-        if(this.segmentView === 'all') {
-            this._appStore.dispatch((this._clientActions.applySelectedClients()));
-        } else {
-            this._appStore.dispatch((this._clientActions.applyDeselectedClients()));
-        }
+        this._appStore.dispatch((this._clientActions.applySelectedClients()));
+
+        // if(this.segmentView === 'all') {
+        //     this._appStore.dispatch((this._clientActions.applySelectedClients()));
+        // } else {
+        //     this._appStore.dispatch((this._clientActions.applyDeselectedClients()));
+        // }
     }
 
     doInfinite(infiniteScroll) {

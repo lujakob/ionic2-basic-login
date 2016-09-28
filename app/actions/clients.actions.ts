@@ -94,9 +94,7 @@ export class ClientsActions extends Actions {
             } else {
                 dispatch(this.updateClient(clientId, clientState, view));
             }
-
         };
-
     }
 
     updateClient(clientId, clientState, view) {
@@ -148,12 +146,19 @@ export class ClientsActions extends Actions {
             this.clientService.getClients(path)
                 .map(data => this.setInitialValues(data))
                 .map(data => {
-                  dispatch(this.receiveClients(data));
+
+                    dispatch(this.receiveClients(data));
                 })
                 .subscribe();
 
         };
     }
+
+    // setClientStates() {
+    //     return {
+    //         type: ClientsActionTypes.SET_CLIENT_STATES
+    //     }
+    // }
 
     /**
      * add initial properties to data
