@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { AlertController } from 'ionic-angular';
 import { AppStore } from 'angular2-redux';
-import { SelectClientsActions } from '../actions/select-clients.actions';
+import { ClientsActions } from '../actions/clients.actions';
 import { ContentActions } from '../actions/content.actions';
 
 @Component({
@@ -14,7 +14,7 @@ export class ClientListButton {
     constructor(
         public alertCtrl: AlertController,
         private _appStore: AppStore,
-        private _selectClientsActions: SelectClientsActions,
+        private _selectClientsActions: ClientsActions,
         private _contentActions: ContentActions) {
     }
 

@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { ModalController } from 'ionic-angular';
 import { AppStore } from 'angular2-redux';
-import { SelectClientsActions } from '../actions/select-clients.actions';
+import { ClientsActions } from '../actions/clients.actions';
 import { ContentActions } from '../actions/content.actions';
 import { ClientSelectModalComponent } from './client-select-modal.component';
 
@@ -15,7 +15,7 @@ export class ClientSelectButton {
   constructor(
     public modalCtrl: ModalController,
     private _appStore: AppStore,
-    private _selectClientsActions: SelectClientsActions,
+    private _selectClientsActions: ClientsActions,
     private _contentActions: ContentActions) {
 
 

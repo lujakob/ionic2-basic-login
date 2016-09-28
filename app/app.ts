@@ -15,7 +15,7 @@ import reducers from "./reducers/app.reducer";
 import { FilmActions } from "./actions/film.actions";
 import { CounterActions } from "./actions/counter.actions";
 import { ContentActions } from "./actions/content.actions";
-import { SelectClientsActions } from "./actions/select-clients.actions";
+import { ClientsActions } from "./actions/clients.actions";
 
 import { AuthService } from './services/auth/auth';
 import { ContentService } from './services/content.service';
@@ -81,7 +81,7 @@ ionicBootstrap(MyApp, [
     AuthService,
     ContentService,
     ClientService,
-    FilmActions,  CounterActions, SelectClientsActions, ContentActions,
+    FilmActions,  CounterActions, ClientsActions, ContentActions,
     {provide: AppStore, useFactory: appStoreFactory },
     {provide: AuthHttp,
         useFactory: (http) => {

@@ -2,8 +2,8 @@ import { Component, ViewChild } from '@angular/core';
 import { Platform, NavParams, ViewController, Content, LoadingController } from 'ionic-angular';
 import { TruncatePipe } from '../pipes/truncate';
 import { AppStore } from 'angular2-redux';
-import { selectedClientsListSelector, appliedClientsListSelector, isFetchingSelector } from '../reducers/select-clients.reducer';
-import { SelectClientsActions }from '../actions/select-clients.actions';
+import { allClientsSelector, selectedClientsSelector, isFetchingSelector } from '../reducers/clients.reducer';
+import { ClientsActions }from '../actions/clients.actions';
 import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
 
 @Component({
@@ -23,7 +23,7 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
     <ion-segment-button value="all">
         All clients
     </ion-segment-button>
-    <ion-segment-button value="applied">
+    <ion-segment-button value="selected">
         Selected clients
     </ion-segment-button>
 </ion-segment>
@@ -34,21 +34,18 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
 <ion-content class="client-select-modal">
     <div [ngSwitch]="segmentView" class="client-select-modal-list" style="height:100%;">
         <div *ngSwitchCase="'all'" style="height:100%;">
-        	<ion-list [virtualScroll]="allClients$" [headerFn]="myHeaderFn">
+        	<ion-list [virtualScroll]="allClients">
 		        <ion-item *virtualItem="let client" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)" [virtualTrackBy]="trackBy">
                     <h2><span class="client-id">{{client.id}}</span><span class="client-title">{{client.clientName | truncate : 10}}($ID{{client.currencyId}}){{client.state}}</span></h2>
                 </ion-item>
-                <ion-item-divider *virtualHeader="let header">
-                    Header: {{ header }}
-                </ion-item-divider>
             </ion-list>
-        	<bmg-infinite-scroll (ionInfinite)="doInfinite($event)">
-        	    <bmg-infinite-scroll-content></bmg-infinite-scroll-content>
-            </bmg-infinite-scroll>
+        	<ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+        	    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+            </ion-infinite-scroll>
         </div>
-        <div *ngSwitchCase="'applied'">
+        <div *ngSwitchCase="'selected'">
             <ion-list>
-                <ion-item *ngFor="let client of appliedClients$ | async" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)">
+                <ion-item *ngFor="let client of selectedClients$ | async" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)">
                     <h2><span class="client-id">{{client.id}}</span><span class="client-title">{{client.clientName}}</span></h2>
                 </ion-item>  
             </ion-list>
@@ -64,11 +61,8 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
     directives: [BmgInfiniteScroll]
 })
 export class ClientSelectModalComponent {
-    private allClients$;
-    private appliedClients$;
-
-    private loading;
-
+    private allClients;
+    private selectedClients$;
 
     public segmentView:string = 'all';
     public test = true;
@@ -81,30 +75,17 @@ export class ClientSelectModalComponent {
                 public viewCtrl:ViewController,
                 private _appStore:AppStore,
                 private loadingCtrl: LoadingController,
-                private _clientActions:SelectClientsActions) {
-        // this.allClients$ = _appStore.select(selectedClientsListSelector);
-        this.appliedClients$ = _appStore.select(appliedClientsListSelector);
-        _appStore.select(selectedClientsListSelector).subscribe((data) => {
-            console.log("all", data);
-            this.allClients$ = data;
+                private _clientActions:ClientsActions) {
+
+
+        this.selectedClients$ = _appStore.select(selectedClientsSelector);
+        _appStore.select(allClientsSelector).subscribe((data) => {
+            this.allClients = data;
         });
-
-        _appStore.select(isFetchingSelector).subscribe((isFetching) => {
-            console.log("isFetching", isFetching);
-            // if(isFetching === false && !!this.content) {
-            //     console.log("scroll to middle");
-            //     this.content.scrollTo(0, 2000, 0);
-            // }
-        });
-
-
-        // _appStore.select(appliedClientsListSelector).subscribe((data) => console.log("applied", data));
-        // _appStore.select(state => state).subscribe((state) => console.log("state changed applied", state));
     }
 
     ionViewWillEnter() {
         this._appStore.dispatch(this._clientActions.fetchClients());
-        // console.log("get state on viewWillEnter", this._appStore.getState());
     }
 
     setClasses(item) {
@@ -145,32 +126,12 @@ export class ClientSelectModalComponent {
         }
     }
 
-    myHeaderFn(record, recordIndex, records) {
-        if (recordIndex % 20 === 0) {
-            return 'Header ' + recordIndex;
-        }
-        return null;
-    }
-
-
     doInfinite(infiniteScroll) {
         console.log("do infinite", infiniteScroll);
-
-        if(infiniteScroll.arrivedAt === 'bottom') {
-            console.log(this._appStore.getState().selectClients.nextOffset);
-            this._appStore.dispatch(this._clientActions.fetchClients(this._appStore.getState().selectClients.nextOffset));
-            setTimeout(() => {
-                //infiniteScroll.complete();
-                infiniteScroll.disableBottom();
-            }, 1000);
-        }
-        if(infiniteScroll.arrivedAt === 'top') {
-            setTimeout(() => {
-                infiniteScroll.complete();
-                infiniteScroll.disableTop();
-            }, 1000);
-        }
-
-
+        this._appStore.dispatch(this._clientActions.fetchClients(this._appStore.getState().clients.nextOffset));
+        setTimeout(() => {
+            this.content.scrollToTop();
+            infiniteScroll.complete();
+        }, 2000);
     }
 }

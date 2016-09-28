@@ -3,7 +3,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { AppStore } from "angular2-redux";
 import { CounterActions } from "../../actions/counter.actions";
 import { counterSelector } from "../../reducers/counter.reducer";
-import { selectedClientSelector } from "../../reducers/select-clients.reducer";
+import { selectedClientsSelector } from "../../reducers/clients.reducer";
 
 @Component({
     //changeDetection:ChangeDetectionStrategy.OnPush,
@@ -26,7 +26,7 @@ export class HomePage {
             this.counter = counter;
         });
 
-        _appStore.select(selectedClientSelector).subscribe(selectedClient => {
+        _appStore.select(selectedClientsSelector).subscribe(selectedClient => {
             console.log("selectedClientSelector", selectedClient);
             this.clientId = selectedClient;
         });

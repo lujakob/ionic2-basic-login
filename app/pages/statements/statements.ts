@@ -2,7 +2,7 @@ import { Component, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { NavController, InfiniteScroll, Content } from 'ionic-angular';
 import { AppStore } from 'angular2-redux';
 import { contentListSelector, contentTotalSelector, contentIsFetchingSelector, contentNextOffsetSelector } from '../../reducers/content.reducer';
-import { selectedClientSelector, selectedClientsListSelector } from '../../reducers/select-clients.reducer';
+import { selectedClientsSelector, allClientsSelector, appliedClientsSelector } from '../../reducers/clients.reducer';
 import { ContentActions } from "../../actions/content.actions";
 import { Subscription } from "rxjs/Rx";
 import { ClientSelectButton } from '../../components/client-select-button.component';
@@ -61,10 +61,10 @@ export class StatementsPage {
         this._appStore.dispatch(this._contentActions.resetNextOffset());
 
         // subscribe to client select change and refetch statements
-        this.selectedClientSubscriber = this._appStore.select(selectedClientSelector).subscribe(clientId => {
+        this.selectedClientSubscriber = this._appStore.select(appliedClientsSelector).subscribe(applied => {
             this.content.scrollToTop(0);
             this.infiniteScroll.enable(true);
-            this._appStore.dispatch(this._contentActions.fetchContent(clientId));
+            this._appStore.dispatch(this._contentActions.fetchContent(applied));
         });
 
         // subscribe to isFetching change and hide spinner if isFetching == false

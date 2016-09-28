@@ -3,7 +3,7 @@ import {Actions, AppStore} from "angular2-redux";
 import { ClientService } from '../services/client.service';
 
 type Types = 'SELECT_CLIENT | REQUEST_CLIENTS | RECEIVE_CLIENTS | RESET_NEXT_OFFSET | UPDATE_CLIENT | UPDATE_CLIENT_STATE | APPLY_SELECTED_CLIENTS | APPLY_DESELECTED_CLIENTS | SELECT_ALL_CLIENTS | DESELECT_ALL_CLIENTS';
-export const SelectClientsActionTypes = {
+export const ClientsActionTypes = {
     SELECT_CLIENT: 'SELECT_CLIENT' as Types,
     REQUEST_CLIENTS: 'REQUEST_CLIENTS' as Types,
     RECEIVE_CLIENTS: 'RECEIVE_CLIENTS' as Types,
@@ -16,12 +16,12 @@ export const SelectClientsActionTypes = {
     DESELECT_ALL_CLIENTS: 'DESELECT_ALL_CLIENTS' as Types
 };
 
-export interface SelectClientsAction {
+export interface ClientsAction {
     type:string;
     client?;
     clientId?;
     total?;
-    list?;
+    allClients?;
     nextOffset?;
     state?;
     clientState?;
@@ -34,11 +34,43 @@ export interface SelectClientsAction {
 // }
 
 @Injectable()
-export class SelectClientsActions extends Actions {
+export class ClientsActions extends Actions {
     constructor(
         appStore: AppStore,
         private clientService: ClientService) {
             super(appStore);
+    }
+
+    /**
+     * requestClients
+     * @returns {{type: (Types|any)}}
+     */
+    requestClients() {
+        return {type: ClientsActionTypes.REQUEST_CLIENTS};
+    }
+
+    /**
+     * receiveClients
+     * @param data
+     * @returns {{type: (Types|any), list: any, nextOffset: (any|number), total: (any|number)}}
+     */
+    receiveClients(data) {
+        return {
+            type: ClientsActionTypes.RECEIVE_CLIENTS,
+            allClients: data.data,
+            nextOffset: data.nextOffset,
+            total: data.total
+        }
+    }
+
+    /**
+     * resetNextOffset
+     * @returns {{type: (Types|any)}}
+     */
+    resetNextOffset() {
+        return {
+            type: ClientsActionTypes.RESET_NEXT_OFFSET
+        }
     }
 
     updateClientState(clientId, clientState, view, offset = 0) {
@@ -69,7 +101,7 @@ export class SelectClientsActions extends Actions {
 
     updateClient(clientId, clientState, view) {
         return {
-            type: SelectClientsActionTypes.UPDATE_CLIENT,
+            type: ClientsActionTypes.UPDATE_CLIENT,
             clientId: clientId,
             view: view,
             clientState: clientState
@@ -78,32 +110,32 @@ export class SelectClientsActions extends Actions {
 
     applySelectedClients() {
         return {
-            type: SelectClientsActionTypes.APPLY_SELECTED_CLIENTS
+            type: ClientsActionTypes.APPLY_SELECTED_CLIENTS
         }
     }
     applyDeselectedClients() {
         return {
-            type: SelectClientsActionTypes.APPLY_DESELECTED_CLIENTS
+            type: ClientsActionTypes.APPLY_DESELECTED_CLIENTS
         }
     }
 
     selectAllClients(view) {
         return {
-            type: SelectClientsActionTypes.SELECT_ALL_CLIENTS,
+            type: ClientsActionTypes.SELECT_ALL_CLIENTS,
             view: view
         };
     }
 
     deselectAllClients(view) {
         return {
-            type: SelectClientsActionTypes.DESELECT_ALL_CLIENTS,
+            type: ClientsActionTypes.DESELECT_ALL_CLIENTS,
             view: view
         };
     }
 
     selectClient(clientId) {
         return {
-            type: SelectClientsActionTypes.SELECT_CLIENT,
+            type: ClientsActionTypes.SELECT_CLIENT,
             clientId: clientId
         }
     }
@@ -121,25 +153,6 @@ export class SelectClientsActions extends Actions {
                 .subscribe();
 
         };
-    }
-
-    requestClients() {
-        return {type: SelectClientsActionTypes.REQUEST_CLIENTS};
-    }
-
-    receiveClients(data) {
-        return {
-            type: SelectClientsActionTypes.RECEIVE_CLIENTS,
-            list: data.data,
-            nextOffset: data.nextOffset,
-            total: data.total
-        }
-    }
-
-    resetNextOffset() {
-        return {
-            type: SelectClientsActionTypes.RESET_NEXT_OFFSET
-        }
     }
 
     /**
