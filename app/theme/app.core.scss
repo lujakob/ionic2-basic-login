@@ -75,16 +75,17 @@
 .client-select-modal-component {
 
     .client-select-modal {
-        margin-top:130px;
-        height:calc(100% - 130px);
+        //margin-top:198px;
+        //height:calc(100% - 198px);
 
         scroll-content {
-            margin-top:0 !important;
+            //margin-top:0 !important;
         }
     }
     .ion-segment-outside {
-        margin-top:44px;
+        //margin-top:44px;
         padding-bottom:0;
+        padding-top:5px;
     }
     .modal-button-bottom {
         position: absolute;
@@ -149,5 +150,12 @@
         display:inline-block;
         width:calc(50% - 0.5em);
 
+    }
+}
+
+.ion-searchbar {
+    display:none;
+    &.show-form {
+        display:block;
     }
 }

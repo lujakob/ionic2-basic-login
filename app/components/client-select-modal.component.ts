@@ -13,14 +13,12 @@ import * as _ from 'lodash';
     <ion-toolbar>
         <ion-title>Select clients</ion-title>
         <ion-buttons start>
-            <button (click)="dismiss()">
-                <span primary showWhen="ios">Cancel</span>
-                <ion-icon name="md-close" showWhen="android,windows"></ion-icon>
+            <button (click)="toggleSearchForm()">
+                <ion-icon name="md-search"></ion-icon>
             </button>
         </ion-buttons>
     </ion-toolbar>
-</ion-header>
-<ion-segment [(ngModel)]="segmentView" (ionChange)="changeSegment()" class="ion-segment-outside" padding>
+    <ion-segment [(ngModel)]="segmentView" (ionChange)="changeSegment()" class="ion-segment-outside" padding>
     <ion-segment-button value="all">
         All clients
     </ion-segment-button>
@@ -30,10 +28,12 @@ import * as _ from 'lodash';
 </ion-segment>
 
 <div class="client-select-toolbar">
+    <ion-searchbar #searchBar class="ion-searchbar" (ionInput)="doSearch($event)" [class.show-form]="showSearchForm"></ion-searchbar>
     <button clear (click)="orderBy('id')" class="btn-order-by-id btn-order-by" [ngClass]="setOrderByClasses('id')">Id</button>
     <button clear (click)="orderBy('path')" class="btn-order-by-path btn-order-by" [ngClass]="setOrderByClasses('path')">Name</button>
     <button clear (click)="selectAll()" class="btn-select-all">Select all</button>
 </div>
+</ion-header>
 
 <ion-content class="client-select-modal">
     <div [ngSwitch]="segmentView" class="client-select-modal-list" style="height:100%;">
@@ -73,9 +73,11 @@ export class ClientSelectModalComponent {
     public segmentView:string = 'all';
     public orderByPathDirection:string = '';
     public orderByIdDirection:string = '';
+    public showSearchForm = false;
 
 
     @ViewChild(Content) content: Content;
+    @ViewChild('searchBar') searchBar;
 
     constructor(public platform:Platform,
                 public params:NavParams,
@@ -97,7 +99,7 @@ export class ClientSelectModalComponent {
         });
 
         _appStore.select(state => state.clients).subscribe((clients) => {
-            console.log("state.clients", clients);
+            // console.log("state.clients", clients);
         });
 
         _appStore.select(isFetchingSelector).subscribe((isFetching) => {
@@ -122,6 +124,40 @@ export class ClientSelectModalComponent {
 
     }
 
+    toggleSearchForm() {
+        this.showSearchForm = !this.showSearchForm;
+
+        let searchBar = this.searchBar._elementRef.nativeElement;
+        console.log("searchBar", searchBar);
+        searchBar.style.display = 'block';
+        let searchBarHeight = searchBar.clientHeight;
+        searchBar.style.display = '';
+        let scrollContent = this.content.getElementRef().nativeElement.children[0];
+
+        console.log(scrollContent);
+        console.log(scrollContent.style);
+        console.log(searchBarHeight);
+        console.log(parseInt(scrollContent.style.marginTop, 10) + searchBarHeight + 'px');
+        scrollContent.style.marginTop = parseInt(scrollContent.style.marginTop, 10) + ((this.showSearchForm ? 1 : -1) * searchBarHeight) + 'px';
+
+
+
+        // if(this.showSearchForm === false) {
+        //     let marginTop = parseInt(scrollContent.style.marginTop, 10);
+        //     console.log("marginTop", marginTop);
+        //     scrollContent.style.marginTop = marginTop + 70 + 'px';
+        //     this.showSearchForm = true;
+        //     console.log(this.searchBar);
+        // }
+    }
+
+    ionViewDidEnter() {
+        console.log("content", this.content.getElementRef().nativeElement.children[0].style.marginTop);
+    }
+
+    doSearch(ev) {
+        console.log("ev", ev);
+    }
 
     changeSegment() {
         if(this.segmentView === 'selected') {
