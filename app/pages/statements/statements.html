@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+			Statements
+			<client-select-button></client-select-button>
+			<client-list-button></client-list-button>
+		</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+	<p>Total statements: {{statementsCount$ | async}}</p>
+	<ion-list [virtualScroll]="statements$">
+		<ion-item *virtualItem="let item">{{item.title}}, ID:{{item.id}} (client-id: {{item.clientId}}) <span class="statement-item-right">{{item.royalties}}</span></ion-item>
+	</ion-list>
+
+</ion-content>

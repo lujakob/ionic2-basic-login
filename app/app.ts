@@ -1,59 +1,94 @@
-import {Component, ViewChild} from '@angular/core';
-import {ionicBootstrap, Platform, MenuController, Nav, AlertController} from 'ionic-angular';
-import {StatusBar} from 'ionic-native';
-import {HomePage} from './pages/home/home';
-import {LoginPage} from './pages/login/login';
-import {UserPage} from './pages/user/user';
-import {SignupPage} from './pages/signup/signup';
-import {HelloIonicPage} from './pages/hello-ionic/hello-ionic';
-import {ListPage} from './pages/list/list';
-import {AuthService} from './services/authservice';
+import {Component, ViewChild, provide, PLATFORM_DIRECTIVES} from '@angular/core';
+import { Http } from '@angular/http';
+import { ionicBootstrap, Platform, MenuController, Nav } from 'ionic-angular';
+import { StatusBar } from 'ionic-native';
+import { ProfilePage } from './pages/profile/profile';
 
+import { TabsPage } from './pages/tabs/tabs';
+import { AuthHttp, AuthConfig } from 'angular2-jwt';
+import { ClientListButton } from './components/client-list-button.component';
+import { ClientSelectButton } from './components/client-select-button.component';
+import { BmgInfiniteScrollContent } from './components/bmg-infinite-scroll-content.component';
+
+import { AppStore, createAppStoreFactoryWithOptions } from "angular2-redux";
+import reducers from "./reducers/app.reducer";
+import { FilmActions } from "./actions/film.actions";
+import { CounterActions } from "./actions/counter.actions";
+import { ContentActions } from "./actions/content.actions";
+import { ClientsActions } from "./actions/clients.actions";
+
+import { AuthService } from './services/auth/auth';
+import { ContentService } from './services/content.service';
+import { ClientService } from './services/client.service';
+
+// my logger middleware
+const loggerMiddleware = store => next => action => {
+    console.log('dispatching', action);
+    return next(action);
+};
+
+const appStoreFactory = createAppStoreFactoryWithOptions({
+    reducers,
+    additionalMiddlewares:[loggerMiddleware],
+    debug:true
+});
 
 @Component({
-  templateUrl: 'build/app.html'
+    templateUrl: 'build/app.html',
+    directives: [ClientListButton, ClientSelectButton, BmgInfiniteScrollContent]
 })
-class MyApp {
-  @ViewChild(Nav) nav: Nav;
+export class MyApp {
+    @ViewChild('myNav') nav: Nav;
 
-  // make HelloIonicPage the root (or first) page
-  rootPage: any = HomePage;
-  pages: Array<{title: string, component: any}>;
+    // make HelloIonicPage the root (or first) page
+    rootPage: any;
+    pages: Array<{title: string, component: any}>;
 
-  constructor(
-    public platform: Platform,
-    public menu: MenuController,
-    public service: AuthService,
-    public alertController: AlertController
-  ) {
-    this.initializeApp();
+    constructor(
+        public platform: Platform,
+        public menu: MenuController,
+        public service: AuthService
+    ) {
 
-    // set our app's pages
-    this.pages = [
-      { title: 'Home', component: HomePage},
-      { title: 'Login', component: LoginPage},
-      { title: 'User', component: UserPage},
-      { title: 'Signup', component: SignupPage},
-      { title: 'Hello Ionic', component: HelloIonicPage },
-      { title: 'My First List', component: ListPage }
-    ];
-  }
+        this.initializeAuthGuard();
+        this.initializeApp();
+    }
 
-  initializeApp() {
-    this.platform.ready().then(() => {
-      // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
-      StatusBar.styleDefault();
-    });
-  }
+    initializeApp() {
+        this.platform.ready().then(() => {
+            // Okay, so the platform is ready and our plugins are available.
+            // Here you can do any higher level native things you might need.
+            StatusBar.styleDefault();
+        });
+    }
 
-  openPage(page) {
-    // close the menu when clicking a link from the menu
-    this.menu.close();
-    // navigate to the new page if it is not the current page
-    this.nav.setRoot(page.component);
-  }
-
+    initializeAuthGuard() {
+        if(this.service.authenticated()) {
+            this.rootPage = TabsPage;
+        } else {
+            this.rootPage = ProfilePage;
+        }
+    }
+    openPage(page) {
+        // close the menu when clicking a link from the menu
+        this.menu.close();
+        // navigate to the new page if it is not the current page
+        this.nav.setRoot(page.component);
+    }
 }
 
-ionicBootstrap(MyApp, [AuthService]);
+ionicBootstrap(MyApp, [
+    AuthService,
+    ContentService,
+    ClientService,
+    FilmActions,  CounterActions, ClientsActions, ContentActions,
+    {provide: AppStore, useFactory: appStoreFactory },
+    {provide: AuthHttp,
+        useFactory: (http) => {
+            return new AuthHttp(new AuthConfig, http);
+        },
+        deps: [Http]
+    },
+    {provide: PLATFORM_DIRECTIVES, useValue: [ClientListButton, ClientSelectButton, BmgInfiniteScrollContent], multi: true}
+]);
+

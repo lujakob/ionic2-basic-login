@@ -1,16 +1,25 @@
-<ion-navbar *navbar>
-  <ion-title>
-    Home
-  </ion-title>
-</ion-navbar>
+<ion-header>
+	<ion-navbar>
+		<ion-title>
+			Home
+			<client-list-button></client-list-button>
+		</ion-title>
+
+	</ion-navbar>
+</ion-header>
 
 <ion-content class="home" padding>
 	<h3>Welcome myBMG App!</h3>
 	<p>
 		Welcome to myBMG App. Here you can see wonderful things!
 	</p>
-	<p>
-		<button (click)="openLogin()">Login</button>
-	</p>
+	<button (click)="increment()" class="btn btn-primary">
+		increment
+	</button>
+	<button (click)="decrement()" class="btn btn-primary">
+		decrement
+	</button>
 
+	<p>Counter: {{ counter }}</p>
+	<p>This is the current client Id {{ clientId }}</p>
 </ion-content>

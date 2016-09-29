@@ -7,6 +7,147 @@
 // By default each design mode includes these shared imports.
 // App Shared Sass variables belong in app.variables.scss.
 
-@import "../pages/hello-ionic/hello-ionic";
+@import "../pages/chart/chart";
 
-@import "../pages/item-details/item-details";
+@import "../components/bmg-infinite-scroll";
+
+.toolbar-client {
+    float:right;
+    cursor:pointer;
+}
+
+.item {
+    padding-left:0;
+}
+
+.statement-item-right {
+    float:right;
+}
+
+.loading-spinner {
+    text-align:center;
+}
+
+.toolbar-button {
+    margin:0 10px;
+}
+
+.client-select-modal {
+    padding-left:0;
+    padding-right:0;
+    .client-id {
+        display:inline-block;
+        width:60px;
+    }
+}
+.client-select-modal-list {
+
+    .client-title {
+        display:inline-block;
+    }
+
+    .item {
+        .item-inner {
+            padding-left:16px;
+            padding-right:16px;
+        }
+        &.depth-level-1 {
+            .client-title {
+                padding-left:20px;
+            }
+        }
+        &.state-selected {
+            background-color: turquoise;
+        }
+        &.state-applied {
+            background-color: darkturquoise;
+        }
+        &.state-deselected {
+            background-color: mediumturquoise;
+        }
+
+    }
+}
+
+.modal-wrapper {
+    background-color:white;
+}
+.client-select-modal-component {
+
+    .client-select-modal {
+        margin-top:130px;
+        height:calc(100% - 130px);
+
+        scroll-content {
+            margin-top:0 !important;
+        }
+    }
+    .ion-segment-outside {
+        margin-top:44px;
+        padding-bottom:0;
+    }
+    .modal-button-bottom {
+        position: absolute;
+        width:100%;
+        bottom:0;
+        padding:10px 20px;
+        button {
+            width:100%;
+        }
+    }
+    .client-select-toolbar {
+        padding-top:5px;
+        button {
+            height:20px;
+        }
+    }
+    .btn-select-all {
+        float:right;
+    }
+    .btn-order-by-name, .btn-order-by-id {
+        text-align:left;
+        &:after {
+            display: block;
+            height: 20px;
+            width: 20px;
+            color: inherit;
+            position: absolute;
+            right: -5px;
+            top: 2px;
+            content:'';
+        }
+        &.order-by-default {
+            &:after {
+                content:"\2195";
+            }
+        }
+        &.order-by-asc {
+            &:after {
+                content:'\2191';
+            }
+        }
+        &.order-by-desc {
+            &:after {
+                content:'\2193';
+            }
+        }
+    }
+    .btn-order-by-name {
+
+    }
+    .btn-order-by-id {
+        width:54px;
+    }
+}
+
+.big-item {
+
+}
+
+.btn {
+    &--50 {
+        display:inline-block;
+        width:calc(50% - 0.5em);
+
+    }
+}
