@@ -2,12 +2,13 @@ import {Injectable} from "@angular/core";
 import {Actions, AppStore} from "angular2-redux";
 import { ClientService } from '../services/client.service';
 
-type Types = 'SELECT_CLIENT | REQUEST_CLIENTS | RECEIVE_CLIENTS | RESET_NEXT_OFFSET | UPDATE_CLIENT | UPDATE_CLIENT_STATE | APPLY_SELECTED_CLIENTS | APPLY_DESELECTED_CLIENTS | SELECT_ALL_CLIENTS | DESELECT_ALL_CLIENTS';
+type Types = 'SELECT_CLIENT | REQUEST_CLIENTS | RECEIVE_CLIENTS | RECEIVE_SELECTED_CLIENTS | RESET_NEXT_OFFSET | UPDATE_CLIENT | UPDATE_CLIENT_STATE | APPLY_SELECTED_CLIENTS | APPLY_DESELECTED_CLIENTS | SELECT_ALL_CLIENTS | DESELECT_ALL_CLIENTS';
 export const ClientsActionTypes = {
     SET_ORDER_BY: 'SET_ORDER_BY' as Types,
     SELECT_CLIENT: 'SELECT_CLIENT' as Types,
     REQUEST_CLIENTS: 'REQUEST_CLIENTS' as Types,
     RECEIVE_CLIENTS: 'RECEIVE_CLIENTS' as Types,
+    RECEIVE_SELECTED_CLIENTS: 'RECEIVE_SELECTED_CLIENTS' as Types,
     RESET_NEXT_OFFSET: 'RESET_NEXT_OFFSET' as Types,
     UPDATE_CLIENT_STATE: 'UPDATE_CLIENT_STATE' as Types,
     UPDATE_CLIENT: 'UPDATE_CLIENT' as Types,
@@ -23,6 +24,7 @@ export interface ClientsAction {
     clientId?;
     total?;
     allClients?;
+    selectedClients?;
     nextOffset?;
     state?;
     clientState?;
@@ -61,6 +63,14 @@ export class ClientsActions extends Actions {
         return {
             type: ClientsActionTypes.RECEIVE_CLIENTS,
             allClients: data.data,
+            nextOffset: data.nextOffset,
+            total: data.total
+        }
+    }
+    receiveSelectedClients(data) {
+        return {
+            type: ClientsActionTypes.RECEIVE_SELECTED_CLIENTS,
+            selectedClients: data.data,
             nextOffset: data.nextOffset,
             total: data.total
         }
@@ -148,22 +158,27 @@ export class ClientsActions extends Actions {
         }
     }
 
-    fetchClients( offset = 0, orderByField = '') {
+    fetchClients( offset = 0, orderBy = {field: 'path', direction: 'asc'}, selectedIds = []) {
         return (dispatch) => {
-            let path = '/?1=1' + (offset > 0 ? '&offset=' + offset : '');
-            //let path = '/?1=1' + (offset > 0 ? '&offset=' + offset : '') + (orderByField !== '' ? '&offset=' + offset : ''' : '');
+            let path = '/?1=1&sortColumn=' + orderBy.field + '&isAsc=' + (orderBy.direction === 'asc' ? 'true' : 'false') + (offset > 0 ? '&offset=' + offset : '');
+
             dispatch(this.requestClients());
 
-            this.clientService.getClients(path)
+            this.clientService.getClients(path, selectedIds)
                 .map(data => this.setInitialValues(data))
                 .map(data => {
+                    if(selectedIds.length === 0) {
+                        dispatch(this.receiveClients(data));
+                    } else {
+                        dispatch(this.receiveSelectedClients(data));
+                    }
 
-                    dispatch(this.receiveClients(data));
                 })
                 .subscribe();
 
         };
     }
+
 
     // setClientStates() {
     //     return {

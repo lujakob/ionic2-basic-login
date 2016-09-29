@@ -5,6 +5,7 @@ import { AppStore } from 'angular2-redux';
 import { allClientsSelector, selectedClientsSelector, isFetchingSelector, orderBySelector } from '../reducers/clients.reducer';
 import { ClientsActions }from '../actions/clients.actions';
 import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
+import * as _ from 'lodash';
 
 @Component({
     template: `
@@ -19,7 +20,7 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
         </ion-buttons>
     </ion-toolbar>
 </ion-header>
-<ion-segment [(ngModel)]="segmentView" class="ion-segment-outside" padding>
+<ion-segment [(ngModel)]="segmentView" (ionChange)="changeSegment()" class="ion-segment-outside" padding>
     <ion-segment-button value="all">
         All clients
     </ion-segment-button>
@@ -30,7 +31,7 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
 
 <div class="client-select-toolbar">
     <button clear (click)="orderBy('id')" class="btn-order-by-id btn-order-by" [ngClass]="setOrderByClasses('id')">Id</button>
-    <button clear (click)="orderBy('name')" class="btn-order-by-name btn-order-by" [ngClass]="setOrderByClasses('name')">Name</button>
+    <button clear (click)="orderBy('path')" class="btn-order-by-path btn-order-by" [ngClass]="setOrderByClasses('path')">Name</button>
     <button clear (click)="selectAll()" class="btn-select-all">Select all</button>
 </div>
 
@@ -48,7 +49,7 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
         </div>
         <div *ngSwitchCase="'selected'">
             <ion-list>
-                <ion-item *ngFor="let client of selectedClients$ | async" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)">
+                <ion-item *ngFor="let client of selectedClients" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)">
                     <h2><span class="client-id">{{client.id}}</span><span class="client-title">{{client.clientName}}</span></h2>
                 </ion-item>  
             </ion-list>
@@ -67,10 +68,10 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
 })
 export class ClientSelectModalComponent {
     private allClients;
-    private selectedClients$;
+    private selectedClients;
 
     public segmentView:string = 'all';
-    public orderByNameDirection:string = '';
+    public orderByPathDirection:string = '';
     public orderByIdDirection:string = '';
 
 
@@ -85,43 +86,70 @@ export class ClientSelectModalComponent {
                 private _clientActions:ClientsActions) {
 
 
-        this.selectedClients$ = _appStore.select(selectedClientsSelector);
+        // this.selectedClients$ = _appStore.select(selectedClientsSelector);
+
         _appStore.select(allClientsSelector).subscribe((data) => {
             this.allClients = data;
+        });
+
+        _appStore.select(selectedClientsSelector).subscribe((data) => {
+            this.selectedClients = data;
         });
 
         _appStore.select(state => state.clients).subscribe((clients) => {
             console.log("state.clients", clients);
         });
 
+        _appStore.select(isFetchingSelector).subscribe((isFetching) => {
+            !isFetching && this.content && this.content.scrollToTop();
+        });
+
         _appStore.select(orderBySelector).subscribe((orderBy) => {
             if(orderBy.field === 'id') {
-                this.orderByNameDirection = 'default';
+                this.orderByPathDirection = 'default';
                 this.orderByIdDirection = orderBy.direction;
             } else {
                 this.orderByIdDirection = 'default';
-                this.orderByNameDirection = orderBy.direction;
+                this.orderByPathDirection = orderBy.direction;
             }
+
+            let clientsState = this._appStore.getState().clients;
+            let selectedIds = this.segmentView === 'selected' ? _.union(this._appStore.getState().clients.selected, this._appStore.getState().clients.applied) : [];
+            this._appStore.dispatch(this._clientActions.fetchClients(0, clientsState.orderBy, selectedIds));
+
         });
 
 
     }
 
+
+    changeSegment() {
+        if(this.segmentView === 'selected') {
+            let clientsState = this._appStore.getState().clients;
+            let selectedIds = _.union(this._appStore.getState().clients.selected, this._appStore.getState().clients.applied);
+            this._appStore.dispatch(this._clientActions.fetchClients(0, clientsState.orderBy, selectedIds));
+        }
+    }
+
+    /**
+     * @todo this function gets called too often. maybe a refactor can solve it
+     * @param field
+     * @returns {any}
+     */
     setOrderByClasses(field) {
         let classes;
-        console.log("orderBy");
 
         if(field === 'id') {
             classes = {
-                'order-by-default': this.orderByIdDirection === 'default',
-                'order-by-asc': this.orderByIdDirection === 'asc',
-                'order-by-desc': this.orderByIdDirection === 'desc'
+                'order-direction-default': this.orderByIdDirection === 'default',
+                'order-direction-asc': this.orderByIdDirection === 'asc',
+                'order-direction-desc': this.orderByIdDirection === 'desc'
             };
         } else {
             classes = {
-                'order-by-default': this.orderByNameDirection === 'default',
-                'order-by-asc': this.orderByNameDirection === 'asc',
-                'order-by-desc': this.orderByNameDirection === 'desc'
+                'order-direction-default': this.orderByPathDirection === 'default',
+                'order-direction-asc': this.orderByPathDirection === 'asc',
+                'order-direction-desc': this.orderByPathDirection === 'desc'
             };
         }
 
