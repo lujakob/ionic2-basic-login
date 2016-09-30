@@ -1,4 +1,4 @@
-import {Component, ViewChild, provide, PLATFORM_DIRECTIVES} from '@angular/core';
+import {Component, ViewChild, PLATFORM_DIRECTIVES} from '@angular/core';
 import { Http } from '@angular/http';
 import { ionicBootstrap, Platform, MenuController, Nav } from 'ionic-angular';
 import { StatusBar } from 'ionic-native';
@@ -10,12 +10,12 @@ import { ClientListButton } from './components/client-list-button.component';
 import { ClientSelectButton } from './components/client-select-button.component';
 import { BmgInfiniteScrollContent } from './components/bmg-infinite-scroll-content.component';
 
-import { AppStore, createAppStoreFactoryWithOptions } from "angular2-redux";
-import reducers from "./reducers/app.reducer";
-import { FilmActions } from "./actions/film.actions";
-import { CounterActions } from "./actions/counter.actions";
-import { ContentActions } from "./actions/content.actions";
-import { ClientsActions } from "./actions/clients.actions";
+import { AppStore, createAppStoreFactoryWithOptions } from 'angular2-redux';
+import reducers from './reducers/app.reducer';
+import { FilmActions } from './actions/film.actions';
+import { CounterActions } from './actions/counter.actions';
+import { ContentActions } from './actions/content.actions';
+import { ClientsActions } from './actions/clients.actions';
 
 import { AuthService } from './services/auth/auth';
 import { ContentService } from './services/content.service';
@@ -29,8 +29,8 @@ const loggerMiddleware = store => next => action => {
 
 const appStoreFactory = createAppStoreFactoryWithOptions({
     reducers,
-    additionalMiddlewares:[loggerMiddleware],
-    debug:true
+    additionalMiddlewares: [loggerMiddleware],
+    debug: true
 });
 
 @Component({
@@ -63,7 +63,7 @@ export class MyApp {
     }
 
     initializeAuthGuard() {
-        if(this.service.authenticated()) {
+        if (this.service.authenticated()) {
             this.rootPage = TabsPage;
         } else {
             this.rootPage = ProfilePage;

@@ -1,5 +1,5 @@
-import {Injectable} from "@angular/core";
-import {Actions, AppStore} from "angular2-redux";
+import {Injectable} from '@angular/core';
+import {Actions, AppStore} from 'angular2-redux';
 import { ClientService } from '../services/client.service';
 
 type Types = 'SELECT_CLIENT | REQUEST_CLIENTS | RECEIVE_CLIENTS | RECEIVE_SELECTED_CLIENTS | RESET_NEXT_OFFSET | UPDATE_CLIENT | UPDATE_CLIENT_STATE | APPLY_SELECTED_CLIENTS | APPLY_DESELECTED_CLIENTS | SELECT_ALL_CLIENTS | DESELECT_ALL_CLIENTS';
@@ -19,7 +19,7 @@ export const ClientsActionTypes = {
 };
 
 export interface ClientsAction {
-    type:string;
+    type: string;
     client?;
     clientId?;
     total?;
@@ -65,7 +65,7 @@ export class ClientsActions extends Actions {
             allClients: data.data,
             nextOffset: data.nextOffset,
             total: data.total
-        }
+        };
     }
     receiveSelectedClients(data) {
         return {
@@ -73,7 +73,7 @@ export class ClientsActions extends Actions {
             selectedClients: data.data,
             nextOffset: data.nextOffset,
             total: data.total
-        }
+        };
     }
 
     /**
@@ -83,15 +83,15 @@ export class ClientsActions extends Actions {
     resetNextOffset() {
         return {
             type: ClientsActionTypes.RESET_NEXT_OFFSET
-        }
+        };
     }
 
     updateClientState(clientId, clientState, view, offset = 0) {
         return (dispatch) => {
-            if(view === 'all') {
+            if (view === 'all') {
                 let path = '/?1=1' + (offset > 0 ? '&offset=' + offset : '') + '&payee=' + clientId;
                 // only get child clients when client state is unselected
-                if(clientState === '') {
+                if (clientState === '') {
                     this.clientService.getClients(path)
                         .map(data => this.setInitialValues(data))
                         .map(data => {
@@ -116,18 +116,18 @@ export class ClientsActions extends Actions {
             clientId: clientId,
             view: view,
             clientState: clientState
-        }
+        };
     }
 
     applySelectedClients() {
         return {
             type: ClientsActionTypes.APPLY_SELECTED_CLIENTS
-        }
+        };
     }
     applyDeselectedClients() {
         return {
             type: ClientsActionTypes.APPLY_DESELECTED_CLIENTS
-        }
+        };
     }
 
     selectAllClients(view) {
@@ -148,14 +148,14 @@ export class ClientsActions extends Actions {
         return {
             type: ClientsActionTypes.SELECT_CLIENT,
             clientId: clientId
-        }
+        };
     }
 
     setOrderBy(orderByField) {
         return {
             type: ClientsActionTypes.SET_ORDER_BY,
             orderByField: orderByField
-        }
+        };
     }
 
     fetchClients( offset = 0, orderBy = {field: 'path', direction: 'asc'}, selectedIds = []) {
@@ -167,7 +167,7 @@ export class ClientsActions extends Actions {
             this.clientService.getClients(path, selectedIds)
                 .map(data => this.setInitialValues(data))
                 .map(data => {
-                    if(selectedIds.length === 0) {
+                    if (selectedIds.length === 0) {
                         dispatch(this.receiveClients(data));
                     } else {
                         dispatch(this.receiveSelectedClients(data));
@@ -197,7 +197,7 @@ export class ClientsActions extends Actions {
             return Object.assign({}, client, {state: ''});
         })});
 
-        //data.data[1].status = 'selected';
+        // data.data[1].status = 'selected';
 
         return data;
     }

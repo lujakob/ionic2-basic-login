@@ -159,3 +159,9 @@
         display:block;
     }
 }
+
+ion-infinite-scroll-content {
+    height:1px;
+    min-height:1px;
+    visibility:hidden;
+}

@@ -1,5 +1,5 @@
 import { Component, ViewChild,ChangeDetectionStrategy } from '@angular/core';
-import { Platform, NavParams, ViewController, NavController, Content, LoadingController } from 'ionic-angular';
+import { Platform, NavParams, ViewController, NavController, Content, LoadingController, VirtualScroll } from 'ionic-angular';
 import { TruncatePipe } from '../pipes/truncate';
 import { AppStore } from 'angular2-redux';
 import { allClientsSelector, selectedClientsSelector, isFetchingSelector, orderBySelector } from '../reducers/clients.reducer';
@@ -69,6 +69,7 @@ import * as _ from 'lodash';
 export class ClientSelectModalComponent {
     private allClients;
     private selectedClients;
+    private loading;
 
     public segmentView:string = 'all';
     public orderByPathDirection:string = '';
@@ -78,6 +79,7 @@ export class ClientSelectModalComponent {
 
     @ViewChild(Content) content: Content;
     @ViewChild('searchBar') searchBar;
+    @ViewChild(VirtualScroll) virtualScroll: VirtualScroll;
 
     constructor(public platform:Platform,
                 public params:NavParams,
@@ -104,6 +106,21 @@ export class ClientSelectModalComponent {
 
         _appStore.select(isFetchingSelector).subscribe((isFetching) => {
             !isFetching && this.content && this.content.scrollToTop();
+
+            if(this.content && isFetching) {
+                this.loading = this.loadingCtrl.create({
+                    content: 'Please wait...'
+                });
+
+                this.loading.present();
+
+                this.loading.onDidDismiss(() => {
+                    console.log('Dismissed loading');
+                    this.virtualScroll.update(false);
+                });
+            } else if (this.content && this.loading && !isFetching) {
+                this.loading.dismiss();
+            }
         });
 
         _appStore.select(orderBySelector).subscribe((orderBy) => {
@@ -129,14 +146,16 @@ export class ClientSelectModalComponent {
      */
     toggleSearchForm() {
         this.showSearchForm = !this.showSearchForm;
+        this.content.resize();
 
-        let scrollContent = this.content.getElementRef().nativeElement.children[0];
-        let searchBar = this.searchBar._elementRef.nativeElement;
-
-        searchBar.style.display = 'block';
-        let searchBarHeight = searchBar.clientHeight;
-        searchBar.style.display = '';
-        scrollContent.style.marginTop = parseInt(scrollContent.style.marginTop, 10) + ((this.showSearchForm ? 1 : -1) * searchBarHeight) + 'px';
+        // maybe I need this code if I want to animate
+        // let scrollContent = this.content.getElementRef().nativeElement.children[0];
+        // let searchBar = this.searchBar._elementRef.nativeElement;
+        //
+        // searchBar.style.display = 'block';
+        // let searchBarHeight = searchBar.clientHeight;
+        // searchBar.style.display = '';
+        // scrollContent.style.marginTop = parseInt(scrollContent.style.marginTop, 10) + ((this.showSearchForm ? 1 : -1) * searchBarHeight) + 'px';
     }
 
     ionViewDidEnter() {
@@ -236,8 +255,9 @@ export class ClientSelectModalComponent {
         console.log("do infinite", infiniteScroll);
         this._appStore.dispatch(this._clientActions.fetchClients(this._appStore.getState().clients.nextOffset));
         setTimeout(() => {
-            this.content.scrollToTop();
+            //this.content.scrollToTop();
             infiniteScroll.complete();
         }, 2000);
+
     }
 }

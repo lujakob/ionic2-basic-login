@@ -1,17 +1,12 @@
-import { inject, addProviders, fakeAsync } from '@angular/core/testing';
+import { inject, addProviders } from '@angular/core/testing';
 import { ContentActions, ContentActionTypes } from './content.actions';
-import { ContentService, IAPIContent } from '../services/content.service';
-import { Actions, AppStore } from "angular2-redux";
+import { ContentService } from '../services/content.service';
+import { AppStore } from "angular2-redux";
 import { createStore } from 'redux';
 
-import {
-  ResponseOptions,
-  Response,
-  Http,
-  BaseRequestOptions,
-  RequestMethod
-} from '@angular/http';import { provide } from '@angular/core';
-import { MockBackend, MockConnection } from '@angular/http/testing';
+import { Http, BaseRequestOptions } from '@angular/http';
+import { provide } from '@angular/core';
+import { MockBackend } from '@angular/http/testing';
 
 
 let appStoreMock:AppStore;
