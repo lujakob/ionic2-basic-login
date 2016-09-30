@@ -124,31 +124,19 @@ export class ClientSelectModalComponent {
 
     }
 
+    /**
+     * toggle search form and adapt scroll-content margin-top accordingly
+     */
     toggleSearchForm() {
         this.showSearchForm = !this.showSearchForm;
 
+        let scrollContent = this.content.getElementRef().nativeElement.children[0];
         let searchBar = this.searchBar._elementRef.nativeElement;
-        console.log("searchBar", searchBar);
+
         searchBar.style.display = 'block';
         let searchBarHeight = searchBar.clientHeight;
         searchBar.style.display = '';
-        let scrollContent = this.content.getElementRef().nativeElement.children[0];
-
-        console.log(scrollContent);
-        console.log(scrollContent.style);
-        console.log(searchBarHeight);
-        console.log(parseInt(scrollContent.style.marginTop, 10) + searchBarHeight + 'px');
         scrollContent.style.marginTop = parseInt(scrollContent.style.marginTop, 10) + ((this.showSearchForm ? 1 : -1) * searchBarHeight) + 'px';
-
-
-
-        // if(this.showSearchForm === false) {
-        //     let marginTop = parseInt(scrollContent.style.marginTop, 10);
-        //     console.log("marginTop", marginTop);
-        //     scrollContent.style.marginTop = marginTop + 70 + 'px';
-        //     this.showSearchForm = true;
-        //     console.log(this.searchBar);
-        // }
     }
 
     ionViewDidEnter() {
