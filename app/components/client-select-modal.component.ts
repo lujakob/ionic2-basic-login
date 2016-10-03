@@ -109,7 +109,6 @@ export class ClientSelectModalComponent {
 
     setOrderByClasses(field) {
         let classes;
-        console.log("orderBy");
 
         if(field === 'id') {
             classes = {
