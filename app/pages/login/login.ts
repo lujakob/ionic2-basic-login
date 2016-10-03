@@ -12,7 +12,9 @@ export class LoginPage {
     private usercreds: any;
     private service: any;
     private nav: any;
-    constructor(private authservice: AuthService, private navcontroller: NavController) {
+    constructor(
+        private authservice: AuthService,
+        private navcontroller: NavController) {
         this.usercreds = {
             name: '',
             password: ''

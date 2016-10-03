@@ -10,7 +10,7 @@ export const initialState = {
     applied: [],
     inList: [],
     nextOffset: 0,
-    orderBy: {field: 'name', direction: 'asc'}
+    orderBy: {field: 'path', direction: 'asc'}
 };
 
 export const clients = (state:any = initialState, action:ClientsAction = {type:"?"}) => {
@@ -25,6 +25,24 @@ export const clients = (state:any = initialState, action:ClientsAction = {type:"
             return Object.assign({}, state, {
                 isFetching: false,
                 allClients: action.allClients.map(client => {
+                    // set client state to 'selected' or 'applied' if found in according list
+                    if(state.selected.indexOf(client.id) >= 0) {
+                        client.state = 'selected';
+                    } else if(state.applied.indexOf(client.id) >= 0) {
+                        client.state = 'applied';
+                    }
+                    return client;
+                }),
+                // allClients: state.nextOffset === 0 ? action.allClients : state.allClients.concat(action.allClients),
+                nextOffset: action.nextOffset,
+                total: action.total
+            });
+
+        // receive clients - set loaded clients, update client items state and disable isFetching
+        case ClientsActionTypes.RECEIVE_SELECTED_CLIENTS:
+            return Object.assign({}, state, {
+                isFetching: false,
+                selectedClients: action.selectedClients.map(client => {
                     // set client state to 'selected' or 'applied' if found in according list
                     if(state.selected.indexOf(client.id) >= 0) {
                         client.state = 'selected';
@@ -122,6 +140,10 @@ export const clients = (state:any = initialState, action:ClientsAction = {type:"
                 // first update client state in list of all clients
                 stateChanges = {
                     allClients: state.allClients.map(item => {
+                        item.state = item.id === action.clientId ? newClientState : item.state;
+                        return item;
+                    }),
+                    selectedClients: state.selectedClients.map(item => {
                         item.state = item.id === action.clientId ? newClientState : item.state;
                         return item;
                     })

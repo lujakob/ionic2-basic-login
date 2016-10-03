@@ -1,10 +1,10 @@
-import { Injectable, Inject } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { Actions, AppStore } from "angular2-redux";
 
-type Types = "INCREMENT" | "DECREMENT";
+type Types = 'INCREMENT' | 'DECREMENT';
 export const CounterActionTypes = {
-  INCREMENT: "INCREMENT" as Types,
-  DECREMENT: "DECREMENT" as Types
+  INCREMENT: 'INCREMENT' as Types,
+  DECREMENT: 'DECREMENT' as Types
 };
 
 export interface CounterAction {
@@ -23,12 +23,12 @@ export class CounterActions extends Actions {
   increment() {
     return {
       type: CounterActionTypes.INCREMENT
-    }
+    };
   }
   decrement() {
     return {
       type: CounterActionTypes.DECREMENT
-    }
+    };
   }
 
 }

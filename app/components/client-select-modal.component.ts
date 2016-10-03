@@ -1,10 +1,11 @@
 import { Component, ViewChild,ChangeDetectionStrategy } from '@angular/core';
-import { Platform, NavParams, ViewController, NavController, Content, LoadingController } from 'ionic-angular';
+import { Platform, NavParams, ViewController, NavController, Content, LoadingController, VirtualScroll } from 'ionic-angular';
 import { TruncatePipe } from '../pipes/truncate';
 import { AppStore } from 'angular2-redux';
 import { allClientsSelector, selectedClientsSelector, isFetchingSelector, orderBySelector } from '../reducers/clients.reducer';
 import { ClientsActions }from '../actions/clients.actions';
 import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
+import * as _ from 'lodash';
 
 @Component({
     template: `
@@ -12,14 +13,12 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
     <ion-toolbar>
         <ion-title>Select clients</ion-title>
         <ion-buttons start>
-            <button (click)="dismiss()">
-                <span primary showWhen="ios">Cancel</span>
-                <ion-icon name="md-close" showWhen="android,windows"></ion-icon>
+            <button (click)="toggleSearchForm()">
+                <ion-icon name="md-search"></ion-icon>
             </button>
         </ion-buttons>
     </ion-toolbar>
-</ion-header>
-<ion-segment [(ngModel)]="segmentView" class="ion-segment-outside" padding>
+    <ion-segment [(ngModel)]="segmentView" (ionChange)="changeSegment()" class="ion-segment-outside" padding>
     <ion-segment-button value="all">
         All clients
     </ion-segment-button>
@@ -29,10 +28,12 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
 </ion-segment>
 
 <div class="client-select-toolbar">
+    <ion-searchbar #searchBar class="ion-searchbar" (ionInput)="doSearch($event)" [class.show-form]="showSearchForm"></ion-searchbar>
     <button clear (click)="orderBy('id')" class="btn-order-by-id btn-order-by" [ngClass]="setOrderByClasses('id')">Id</button>
-    <button clear (click)="orderBy('name')" class="btn-order-by-name btn-order-by" [ngClass]="setOrderByClasses('name')">Name</button>
+    <button clear (click)="orderBy('path')" class="btn-order-by-path btn-order-by" [ngClass]="setOrderByClasses('path')">Name</button>
     <button clear (click)="selectAll()" class="btn-select-all">Select all</button>
 </div>
+</ion-header>
 
 <ion-content class="client-select-modal">
     <div [ngSwitch]="segmentView" class="client-select-modal-list" style="height:100%;">
@@ -48,7 +49,7 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
         </div>
         <div *ngSwitchCase="'selected'">
             <ion-list>
-                <ion-item *ngFor="let client of selectedClients$ | async" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)">
+                <ion-item *ngFor="let client of selectedClients" (click)="updateClientStatus(client)" [ngClass]="setClasses(client)">
                     <h2><span class="client-id">{{client.id}}</span><span class="client-title">{{client.clientName}}</span></h2>
                 </ion-item>  
             </ion-list>
@@ -67,14 +68,18 @@ import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
 })
 export class ClientSelectModalComponent {
     private allClients;
-    private selectedClients$;
+    private selectedClients;
+    private loading;
 
     public segmentView:string = 'all';
-    public orderByNameDirection:string = '';
+    public orderByPathDirection:string = '';
     public orderByIdDirection:string = '';
+    public showSearchForm = false;
 
 
     @ViewChild(Content) content: Content;
+    @ViewChild('searchBar') searchBar;
+    @ViewChild(VirtualScroll) virtualScroll: VirtualScroll;
 
     constructor(public platform:Platform,
                 public params:NavParams,
@@ -85,42 +90,109 @@ export class ClientSelectModalComponent {
                 private _clientActions:ClientsActions) {
 
 
-        this.selectedClients$ = _appStore.select(selectedClientsSelector);
+        // this.selectedClients$ = _appStore.select(selectedClientsSelector);
+
         _appStore.select(allClientsSelector).subscribe((data) => {
             this.allClients = data;
         });
 
+        _appStore.select(selectedClientsSelector).subscribe((data) => {
+            this.selectedClients = data;
+        });
+
         _appStore.select(state => state.clients).subscribe((clients) => {
-            console.log("state.clients", clients);
+            // console.log("state.clients", clients);
+        });
+
+        _appStore.select(isFetchingSelector).subscribe((isFetching) => {
+            !isFetching && this.content && this.content.scrollToTop();
+
+            if(this.content && isFetching) {
+                this.loading = this.loadingCtrl.create({
+                    content: 'Please wait...'
+                });
+
+                this.loading.present();
+
+                this.loading.onDidDismiss(() => {
+                    console.log('Dismissed loading');
+                    this.virtualScroll.update(false);
+                });
+            } else if (this.content && this.loading && !isFetching) {
+                this.loading.dismiss();
+            }
         });
 
         _appStore.select(orderBySelector).subscribe((orderBy) => {
             if(orderBy.field === 'id') {
-                this.orderByNameDirection = 'default';
+                this.orderByPathDirection = 'default';
                 this.orderByIdDirection = orderBy.direction;
             } else {
                 this.orderByIdDirection = 'default';
-                this.orderByNameDirection = orderBy.direction;
+                this.orderByPathDirection = orderBy.direction;
             }
+
+            let clientsState = this._appStore.getState().clients;
+            let selectedIds = this.segmentView === 'selected' ? _.union(this._appStore.getState().clients.selected, this._appStore.getState().clients.applied) : [];
+            this._appStore.dispatch(this._clientActions.fetchClients(0, clientsState.orderBy, selectedIds));
+
         });
 
 
     }
 
+    /**
+     * toggle search form and adapt scroll-content margin-top accordingly
+     */
+    toggleSearchForm() {
+        this.showSearchForm = !this.showSearchForm;
+        this.content.resize();
+
+        // maybe I need this code if I want to animate
+        // let scrollContent = this.content.getElementRef().nativeElement.children[0];
+        // let searchBar = this.searchBar._elementRef.nativeElement;
+        //
+        // searchBar.style.display = 'block';
+        // let searchBarHeight = searchBar.clientHeight;
+        // searchBar.style.display = '';
+        // scrollContent.style.marginTop = parseInt(scrollContent.style.marginTop, 10) + ((this.showSearchForm ? 1 : -1) * searchBarHeight) + 'px';
+    }
+
+    ionViewDidEnter() {
+        console.log("content", this.content.getElementRef().nativeElement.children[0].style.marginTop);
+    }
+
+    doSearch(ev) {
+        console.log("ev", ev);
+    }
+
+    changeSegment() {
+        if(this.segmentView === 'selected') {
+            let clientsState = this._appStore.getState().clients;
+            let selectedIds = _.union(this._appStore.getState().clients.selected, this._appStore.getState().clients.applied);
+            this._appStore.dispatch(this._clientActions.fetchClients(0, clientsState.orderBy, selectedIds));
+        }
+    }
+
+    /**
+     * @todo this function gets called too often. maybe a refactor can solve it
+     * @param field
+     * @returns {any}
+     */
     setOrderByClasses(field) {
         let classes;
 
         if(field === 'id') {
             classes = {
-                'order-by-default': this.orderByIdDirection === 'default',
-                'order-by-asc': this.orderByIdDirection === 'asc',
-                'order-by-desc': this.orderByIdDirection === 'desc'
+                'order-direction-default': this.orderByIdDirection === 'default',
+                'order-direction-asc': this.orderByIdDirection === 'asc',
+                'order-direction-desc': this.orderByIdDirection === 'desc'
             };
         } else {
             classes = {
-                'order-by-default': this.orderByNameDirection === 'default',
-                'order-by-asc': this.orderByNameDirection === 'asc',
-                'order-by-desc': this.orderByNameDirection === 'desc'
+                'order-direction-default': this.orderByPathDirection === 'default',
+                'order-direction-asc': this.orderByPathDirection === 'asc',
+                'order-direction-desc': this.orderByPathDirection === 'desc'
             };
         }
 
@@ -183,8 +255,9 @@ export class ClientSelectModalComponent {
         console.log("do infinite", infiniteScroll);
         this._appStore.dispatch(this._clientActions.fetchClients(this._appStore.getState().clients.nextOffset));
         setTimeout(() => {
-            this.content.scrollToTop();
+            //this.content.scrollToTop();
             infiniteScroll.complete();
         }, 2000);
+
     }
 }

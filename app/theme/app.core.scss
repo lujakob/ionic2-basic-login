@@ -75,16 +75,17 @@
 .client-select-modal-component {
 
     .client-select-modal {
-        margin-top:130px;
-        height:calc(100% - 130px);
+        //margin-top:198px;
+        //height:calc(100% - 198px);
 
         scroll-content {
-            margin-top:0 !important;
+            //margin-top:0 !important;
         }
     }
     .ion-segment-outside {
-        margin-top:44px;
+        //margin-top:44px;
         padding-bottom:0;
+        padding-top:5px;
     }
     .modal-button-bottom {
         position: absolute;
@@ -104,7 +105,7 @@
     .btn-select-all {
         float:right;
     }
-    .btn-order-by-name, .btn-order-by-id {
+    .btn-order-by-path, .btn-order-by-id {
         text-align:left;
         &:after {
             display: block;
@@ -116,23 +117,23 @@
             top: 2px;
             content:'';
         }
-        &.order-by-default {
+        &.order-direction-default {
             &:after {
                 content:"\2195";
             }
         }
-        &.order-by-asc {
-            &:after {
-                content:'\2191';
-            }
-        }
-        &.order-by-desc {
+        &.order-direction-asc {
             &:after {
                 content:'\2193';
             }
         }
+        &.order-direction-desc {
+            &:after {
+                content:'\2191';
+            }
+        }
     }
-    .btn-order-by-name {
+    .btn-order-by-path {
 
     }
     .btn-order-by-id {
@@ -150,4 +151,17 @@
         width:calc(50% - 0.5em);
 
     }
+}
+
+.ion-searchbar {
+    display:none;
+    &.show-form {
+        display:block;
+    }
+}
+
+ion-infinite-scroll-content {
+    height:1px;
+    min-height:1px;
+    visibility:hidden;
 }

@@ -7,6 +7,6 @@ router.post('/authenticate', actions.authenticate);
 router.post('/adduser', actions.addNew);
 router.get('/getinfo', actions.getinfo);
 router.get('/statements', actions.getStatements);
-router.get('/clients', actions.getClients);
+router.post('/clients', actions.getClients);
 
 module.exports=router;

@@ -118,18 +118,23 @@ var functions = {
     getClients: function(req, res) {
         var limit = 100,
             offset = 0,
-            defaultSortby = 'clientName',
+            defaultSortby = 'path',
+            sortDirection = 'asc',
             nextOffset,
-            total;
+            total,
+            reqBody;
 
         var params = req.query;
 
+        reqBody = req.body;
+
         // var clientId = parseInt(params.clientId);
-        var sortby = params.sortby && params.sortby.length > 0 ? params.sortby : defaultSortby;
+        var sortColumn = params.sortColumn && params.sortColumn.length > 0 ? params.sortColumn : defaultSortby;
+        var sortDirection = params.isAsc && params.isAsc.length > 0 ? (params.isAsc === 'false' ? 'desc' : 'asc') : sortDirection;
         var payee = params.payee && params.payee.length > 0 ? parseInt(params.payee) : null;
 
         var data = require('../../www/data/clientsData.json');
-        //data = _.take(data, 13);
+        //data = _.take(data, 5);
 
         // flatMap to _source
         data = _.flatMap(data, function(item) { return item._source});
@@ -140,27 +145,23 @@ var functions = {
             });
         }
 
+        if(reqBody && reqBody.clientIds && reqBody.clientIds.length > 0) {
+            data = data.filter(function(item) { return reqBody.clientIds.indexOf(item.id) >= 0 });
+        }
+
         // take a few for testing
         // data = _.take(data, 3);
 
         // pick needed properties
         data = _.map(data, function(item) {
-            return _.pick(item, ['id', 'clientName', 'currencyId', 'payeeId', 'payee', 'depth'])
+            return _.pick(item, ['id', 'clientName', 'currencyId', 'payeeId', 'payee', 'depth', 'path'])
         });
 
         total = data.length;
 
+
         // sorting by title/id
-        switch(sortby) {
-            case 'clientName':
-                data = _.sortBy(data, function(o) { return o.clientName; });
-                break;
-            case 'id':
-                data = _.sortBy(data, function(o) { return o.id; });
-                break;
-            default:
-                data = data;
-        }
+        data = _.orderBy(data, [sortColumn], [sortDirection]);
 
         // offset / limit
         if (params.offset && parseInt(params.offset) > 0) {

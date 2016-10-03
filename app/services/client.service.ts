@@ -16,17 +16,17 @@ export type IAPIClients = {
 @Injectable()
 export class ClientService {
 
-  constructor (private _http: Http) {}
+    constructor (private _http: Http) {}
 
-  /**
-   *
-   * @param path
-   * @returns {Observable<R>}
-   */
-  getClients(path:string = ''):Observable<IAPIClients> {
-    return this._http.get(BASE_URL + path)
-      .map<IAPIClients>(res => res.json());
-  }
+    /**
+    *
+    * @param path
+    * @returns {Observable<R>}
+    */
+    getClients(path:string = '', clientIds = []):Observable<IAPIClients> {
+        return this._http.post(BASE_URL + path, {clientIds: clientIds})
+          .map<IAPIClients>(res => res.json());
+    }
 
 
     //
