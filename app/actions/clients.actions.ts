@@ -1,15 +1,17 @@
-import {Injectable} from '@angular/core';
-import {Actions, AppStore} from 'angular2-redux';
+import { Injectable } from '@angular/core';
+import { Actions, AppStore } from 'angular2-redux';
 import { ClientService } from '../services/client.service';
+import { CLIENTS_PER_PAGE } from '../app';
+import * as _ from 'lodash';
 
-type Types = 'SELECT_CLIENT | REQUEST_CLIENTS | RECEIVE_CLIENTS | RECEIVE_SELECTED_CLIENTS | RESET_NEXT_OFFSET | UPDATE_CLIENT | UPDATE_CLIENT_STATE | APPLY_SELECTED_CLIENTS | APPLY_DESELECTED_CLIENTS | SELECT_ALL_CLIENTS | DESELECT_ALL_CLIENTS';
+type Types = 'SELECT_CLIENT | REQUEST_CLIENTS | RECEIVE_CLIENTS | RECEIVE_SELECTED_CLIENTS | RESET_OFFSET | UPDATE_CLIENT | UPDATE_CLIENT_STATE | APPLY_SELECTED_CLIENTS | APPLY_DESELECTED_CLIENTS | SELECT_ALL_CLIENTS | DESELECT_ALL_CLIENTS';
 export const ClientsActionTypes = {
     SET_ORDER_BY: 'SET_ORDER_BY' as Types,
     SELECT_CLIENT: 'SELECT_CLIENT' as Types,
     REQUEST_CLIENTS: 'REQUEST_CLIENTS' as Types,
     RECEIVE_CLIENTS: 'RECEIVE_CLIENTS' as Types,
     RECEIVE_SELECTED_CLIENTS: 'RECEIVE_SELECTED_CLIENTS' as Types,
-    RESET_NEXT_OFFSET: 'RESET_NEXT_OFFSET' as Types,
+    RESET_OFFSET: 'RESET_OFFSET' as Types,
     UPDATE_CLIENT_STATE: 'UPDATE_CLIENT_STATE' as Types,
     UPDATE_CLIENT: 'UPDATE_CLIENT' as Types,
     APPLY_SELECTED_CLIENTS: 'APPLY_SELECTED_CLIENTS' as Types,
@@ -31,6 +33,8 @@ export interface ClientsAction {
     view?;
     orderByField?;
     orderByDirection?;
+    direction?;
+    reset?;
 }
 
 // export interface ContentActionsInterface {
@@ -40,10 +44,14 @@ export interface ClientsAction {
 
 @Injectable()
 export class ClientsActions extends Actions {
+    private _appStore: AppStore;
+
     constructor(
         appStore: AppStore,
         private clientService: ClientService) {
             super(appStore);
+            this._appStore = appStore;
+
     }
 
     /**
@@ -59,12 +67,12 @@ export class ClientsActions extends Actions {
      * @param data
      * @returns {{type: (Types|any), list: any, nextOffset: (any|number), total: (any|number)}}
      */
-    receiveClients(data) {
+    receiveClients(data, direction) {
         return {
             type: ClientsActionTypes.RECEIVE_CLIENTS,
             allClients: data.data,
-            nextOffset: data.nextOffset,
-            total: data.total
+            total: data.total,
+            direction: direction
         };
     }
     receiveSelectedClients(data) {
@@ -80,9 +88,9 @@ export class ClientsActions extends Actions {
      * resetNextOffset
      * @returns {{type: (Types|any)}}
      */
-    resetNextOffset() {
+    resetOffset() {
         return {
-            type: ClientsActionTypes.RESET_NEXT_OFFSET
+            type: ClientsActionTypes.RESET_OFFSET
         };
     }
 
@@ -151,16 +159,34 @@ export class ClientsActions extends Actions {
         };
     }
 
-    setOrderBy(orderByField) {
-        return {
-            type: ClientsActionTypes.SET_ORDER_BY,
-            orderByField: orderByField
+    orderClients(orderByField, segmentView) {
+        let selectedIds = segmentView === 'selected' ? _.union(this._appStore.getState().clients.selected, this._appStore.getState().clients.applied) : [];
+        return (dispatch) => {
+            dispatch(this.setOrderBy(orderByField));
+            dispatch(this.resetOffset());
+            dispatch(this.fetchClients('next', selectedIds));
         };
     }
 
-    fetchClients( offset = 0, orderBy = {field: 'path', direction: 'asc'}, selectedIds = []) {
+    setOrderBy(orderByField, reset = false) {
+        return {
+            type: ClientsActionTypes.SET_ORDER_BY,
+            orderByField: orderByField,
+            reset: reset
+        };
+    }
+
+    // fetchClients( offset = 0, limit = 100, orderBy = {field: 'path', direction: 'asc'}, selectedIds = []) {
+    fetchClients(direction = 'next', selectedIds = []) {
+        let offset = (direction === 'next' ? this._appStore.getState().clients.nextOffset : this._appStore.getState().clients.prevOffset),
+            limit = CLIENTS_PER_PAGE,
+            orderBy = this._appStore.getState().clients.orderBy;
+
         return (dispatch) => {
-            let path = '/?1=1&sortColumn=' + orderBy.field + '&isAsc=' + (orderBy.direction === 'asc' ? 'true' : 'false') + (offset > 0 ? '&offset=' + offset : '');
+            if (offset < 0) {
+                return false;
+            }
+            let path = '/?1=1&sortColumn=' + orderBy.field + '&isAsc=' + (orderBy.direction === 'asc' ? 'true' : 'false') + (offset > 0 ? '&offset=' + offset : '') + (limit > 0 ? '&limit=' + limit : '');
 
             dispatch(this.requestClients());
 
@@ -168,7 +194,7 @@ export class ClientsActions extends Actions {
                 .map(data => this.setInitialValues(data))
                 .map(data => {
                     if (selectedIds.length === 0) {
-                        dispatch(this.receiveClients(data));
+                        dispatch(this.receiveClients(data, direction));
                     } else {
                         dispatch(this.receiveSelectedClients(data));
                     }

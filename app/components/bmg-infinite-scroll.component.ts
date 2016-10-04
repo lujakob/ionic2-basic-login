@@ -1,5 +1,7 @@
 import { Directive, ElementRef, EventEmitter, Host, Input, NgZone, Output } from '@angular/core';
 
+import { clearNativeTimeout, nativeTimeout } from 'ionic-angular/util/dom';
+
 import { Content } from 'ionic-angular';
 
 /**
@@ -102,11 +104,12 @@ export class BmgInfiniteScroll {
     _thrPx: number = 0;
     _thrPc: number = 0.15;
     _init: boolean = false;
+    _tmId: number;
 
     state: string = STATE_ENABLED;
     arrivedAt: string = 'bottom';
-    stateBottom: boolean = true;
-    stateTop: boolean = false;
+    stateBottom: string = STATE_ENABLED;
+    stateTop: string = STATE_BLOCKED;
 
 
     /**
@@ -154,7 +157,8 @@ export class BmgInfiniteScroll {
     }
 
     _onScroll() {
-        if (this.state === STATE_LOADING) {
+
+        if (this.stateBottom === STATE_LOADING || this.stateTop === STATE_LOADING) {
             // if (this.state === STATE_LOADING || this.state === STATE_DISABLED) {
             return 1;
         }
@@ -165,14 +169,22 @@ export class BmgInfiniteScroll {
             // no need to check less than every XXms
             return 2;
         }
+
         this._lastCheck = now;
+
+        // call _onScroll one more time after scroll end, to make sure the last one didn't fall through the the 32ms
+        clearNativeTimeout(this._tmId);
+        this._tmId = nativeTimeout(() => {
+            this._onScroll.bind(this);
+            console.debug("ion-content scroll: run one more after scroll end");
+        }, 40);
 
         let infiniteHeight = this._elementRef.nativeElement.scrollHeight;
 
-        // if (!infiniteHeight) {
-        //     // if there is no height of this element then do nothing
-        //     return 3;
-        // }
+        if (!infiniteHeight) {
+            // if there is no height of this element then do nothing
+            return 3;
+        }
 
         let d = this._content.getContentDimensions();
 
@@ -182,27 +194,32 @@ export class BmgInfiniteScroll {
         } else {
             reloadY += this._thrPx;
         }
-        // console.log("d.scrollTop", d.scrollTop);
 
+        // enable stateTop on scroll y > 100
+        if (this.stateTop === STATE_DISABLED && d.scrollTop > RANGE_TOP) {
+            this.stateTop = STATE_ENABLED;
+        }
+
+        // on arrive bottom
         let distanceFromInfinite = ((d.scrollHeight - infiniteHeight) - d.scrollTop) - reloadY;
-        if (this.stateBottom && distanceFromInfinite < 0) {
+
+        if (this.stateBottom === STATE_ENABLED && distanceFromInfinite < 0) {
             this._zone.run(() => {
-                if (this.state !== STATE_LOADING && this.state !== STATE_DISABLED) {
-                    this.state = STATE_LOADING;
-                    this.stateBottom = false;
-                    this.stateTop = true;
-                    this.arrivedAt = 'bottom';
-                    this.ionInfinite.emit(this);
-                }
+                // if (this.state !== STATE_LOADING && this.state !== STATE_DISABLED) {
+                //
+                // }
+                this.state = STATE_LOADING;
+                this.stateBottom = STATE_LOADING;
+                this.arrivedAt = 'bottom';
+                this.ionInfinite.emit(this);
             });
             return 5;
         }
 
-        if(this.stateTop && d.scrollTop === 0) {
+        // on arrive top
+        if(this.stateTop === STATE_ENABLED && d.scrollTop < RANGE_TOP) {
             this.arrivedAt = 'top';
-            this.stateBottom = true;
-            this.stateTop = false;
-            this.state = STATE_LOADING;
+            this.stateTop = STATE_LOADING;
             this.ionInfinite.emit(this);
         }
 
@@ -210,11 +227,11 @@ export class BmgInfiniteScroll {
     }
 
     disableTop() {
-        this.stateTop = false;
+        this.stateTop = STATE_BLOCKED;
     }
 
     disableBottom() {
-        this.stateBottom = false;
+        this.stateBottom = STATE_BLOCKED;
     }
 
 
@@ -229,7 +246,11 @@ export class BmgInfiniteScroll {
      * to `enabled`.
      */
     complete() {
-        this.state = STATE_ENABLED;
+        if(this.arrivedAt === 'top') {
+            this.stateTop = STATE_DISABLED;
+        } else {
+            this.stateBottom = STATE_ENABLED;
+        }
     }
 
     /**
@@ -244,6 +265,14 @@ export class BmgInfiniteScroll {
     enable(shouldEnable: boolean) {
         this.state = (shouldEnable ? STATE_ENABLED : STATE_DISABLED);
         this._setListeners(shouldEnable);
+    }
+    enableTop(shouldEnable: boolean) {
+        this.stateTop = (shouldEnable ? STATE_DISABLED : STATE_BLOCKED);
+        //this._setListeners(shouldEnable);
+    }
+    enableBottom(shouldEnable: boolean) {
+        this.stateBottom = (shouldEnable ? STATE_ENABLED : STATE_BLOCKED);
+        //this._setListeners(shouldEnable);
     }
 
     _setListeners(shouldListen: boolean) {
@@ -281,4 +310,8 @@ export class BmgInfiniteScroll {
 
 const STATE_ENABLED = 'enabled';
 const STATE_DISABLED = 'disabled';
+const STATE_BLOCKED = 'blocked';
 const STATE_LOADING = 'loading';
+
+const RANGE_TOP = 80;
+

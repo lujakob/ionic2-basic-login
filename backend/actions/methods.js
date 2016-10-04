@@ -134,7 +134,6 @@ var functions = {
         var payee = params.payee && params.payee.length > 0 ? parseInt(params.payee) : null;
 
         var data = require('../../www/data/clientsData.json');
-        //data = _.take(data, 5);
 
         // flatMap to _source
         data = _.flatMap(data, function(item) { return item._source});
@@ -157,15 +156,23 @@ var functions = {
             return _.pick(item, ['id', 'clientName', 'currencyId', 'payeeId', 'payee', 'depth', 'path'])
         });
 
-        total = data.length;
-
 
         // sorting by title/id
         data = _.orderBy(data, [sortColumn], [sortDirection]);
 
-        // offset / limit
+        if(data.length >= 300) {
+            data = _.take(data, 300);
+        }
+        total = data.length;
+
+        // offset
         if (params.offset && parseInt(params.offset) > 0) {
             offset = parseInt(params.offset);
+        }
+
+        // limit
+        if (params.limit && parseInt(params.limit) > 0) {
+            limit = parseInt(params.limit);
         }
 
         nextOffset = data.length > limit + offset ? limit + offset : -1;

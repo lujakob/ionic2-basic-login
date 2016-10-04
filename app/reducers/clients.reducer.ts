@@ -1,4 +1,5 @@
 import { ClientsActionTypes, ClientsAction } from '../actions/clients.actions';
+import { CLIENTS_PER_PAGE } from '../app';
 import * as _ from 'lodash';
 
 export const initialState = {
@@ -8,9 +9,10 @@ export const initialState = {
     selected: [],
     deselected: [],
     applied: [],
-    inList: [],
     nextOffset: 0,
-    orderBy: {field: 'path', direction: 'asc'}
+    prevOffset: -1,
+    orderBy: {field: 'path', direction: 'asc'},
+    total: 0
 };
 
 export const clients = (state:any = initialState, action:ClientsAction = {type:"?"}) => {
@@ -34,7 +36,24 @@ export const clients = (state:any = initialState, action:ClientsAction = {type:"
                     return client;
                 }),
                 // allClients: state.nextOffset === 0 ? action.allClients : state.allClients.concat(action.allClients),
-                nextOffset: action.nextOffset,
+                nextOffset: (() => {
+                    if(action.direction === 'next') {
+                        return state.nextOffset + CLIENTS_PER_PAGE < action.total ? state.nextOffset + CLIENTS_PER_PAGE : -1;
+                    } else {
+                        if(state.prevOffset < 0) {
+                            return CLIENTS_PER_PAGE;
+                        } else {
+                            return state.prevOffset + CLIENTS_PER_PAGE;
+                        }
+                    }
+                })(),
+                prevOffset: (() => {
+                    if(action.direction === 'next') {
+                        return state.nextOffset - CLIENTS_PER_PAGE < 0 ? -1 : state.nextOffset - CLIENTS_PER_PAGE;
+                    } else {
+                        return state.prevOffset - CLIENTS_PER_PAGE >= 0 ? state.prevOffset - CLIENTS_PER_PAGE : -1;
+                    }
+                })(),
                 total: action.total
             });
 
@@ -57,8 +76,11 @@ export const clients = (state:any = initialState, action:ClientsAction = {type:"
             });
 
         // reset offset
-        case ClientsActionTypes.RESET_NEXT_OFFSET: {
-            return Object.assign({}, state, {nextOffset: initialState.nextOffset});
+        case ClientsActionTypes.RESET_OFFSET: {
+            return Object.assign({}, state, {
+                nextOffset: initialState.nextOffset,
+                prevOffset: initialState.prevOffset
+            });
         }
 
         case ClientsActionTypes.SELECT_CLIENT: {
@@ -116,18 +138,6 @@ export const clients = (state:any = initialState, action:ClientsAction = {type:"
             });
         }
 
-        // case ClientsActionTypes.APPLY_DESELECTED_CLIENTS: {
-        //     return Object.assign({}, state, {
-        //         applied: state.applied.filter(client => client.state === 'applied'),
-        //         allClients: state.allClients.map(client => {
-        //             if(client.state === 'deselected') {
-        //                 client.state = '';
-        //             }
-        //             return client;
-        //         })
-        //     });
-        // }
-
         case ClientsActionTypes.UPDATE_CLIENT: {
             let oldClientState = action.clientState;
             let newClientState = getNewState(action);
@@ -176,8 +186,8 @@ export const clients = (state:any = initialState, action:ClientsAction = {type:"
         case ClientsActionTypes.SET_ORDER_BY: {
             return Object.assign({}, state, {
                 orderBy: {
-                    field: action.orderByField,
-                    direction: (() => {
+                    field: action.reset ? initialState.orderBy.field : action.orderByField,
+                    direction: action.reset ? initialState.orderBy.direction : (() => {
                         let newDirection:string;
                         if(action.orderByField === state.orderBy.field) {
                             newDirection = state.orderBy.direction === 'asc' ? 'desc' : 'asc';

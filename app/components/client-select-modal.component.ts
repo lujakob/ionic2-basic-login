@@ -6,6 +6,8 @@ import { allClientsSelector, selectedClientsSelector, isFetchingSelector, orderB
 import { ClientsActions }from '../actions/clients.actions';
 import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
 import * as _ from 'lodash';
+import 'rxjs/add/operator/skip';
+import {CLIENTS_PER_PAGE} from "../app";
 
 @Component({
     template: `
@@ -43,9 +45,9 @@ import * as _ from 'lodash';
                     <h2><span class="client-id">{{client.id}}</span><span class="client-title">{{client.clientName | truncate : 10}}($ID{{client.currencyId}}){{client.state}}</span></h2>
                 </ion-item>
             </ion-list>
-        	<ion-infinite-scroll (ionInfinite)="doInfinite($event)">
-        	    <ion-infinite-scroll-content></ion-infinite-scroll-content>
-            </ion-infinite-scroll>
+        	<bmg-infinite-scroll (ionInfinite)="doInfinite($event)">
+        	    <bmg-infinite-scroll-content></bmg-infinite-scroll-content>
+            </bmg-infinite-scroll>
         </div>
         <div *ngSwitchCase="'selected'">
             <ion-list>
@@ -76,10 +78,10 @@ export class ClientSelectModalComponent {
     public orderByIdDirection:string = '';
     public showSearchForm = false;
 
-
     @ViewChild(Content) content: Content;
     @ViewChild('searchBar') searchBar;
     @ViewChild(VirtualScroll) virtualScroll: VirtualScroll;
+    @ViewChild(BmgInfiniteScroll) infiniteScroll: BmgInfiniteScroll;
 
     constructor(public platform:Platform,
                 public params:NavParams,
@@ -100,12 +102,14 @@ export class ClientSelectModalComponent {
             this.selectedClients = data;
         });
 
+
         _appStore.select(state => state.clients).subscribe((clients) => {
-            // console.log("state.clients", clients);
+            console.log("clients", clients);
+            // console.log("prevOffset", clients.prevOffset);
         });
 
-        _appStore.select(isFetchingSelector).subscribe((isFetching) => {
-            !isFetching && this.content && this.content.scrollToTop();
+        // isFetching
+        _appStore.select(isFetchingSelector).skip(2).subscribe((isFetching) => {
 
             if(this.content && isFetching) {
                 this.loading = this.loadingCtrl.create({
@@ -115,14 +119,41 @@ export class ClientSelectModalComponent {
                 this.loading.present();
 
                 this.loading.onDidDismiss(() => {
-                    console.log('Dismissed loading');
                     this.virtualScroll.update(false);
+
+
+                    this.infiniteScroll.complete();
+                    let nextOffset = this._appStore.getState().clients.nextOffset;
+                    let prevOffset = this._appStore.getState().clients.prevOffset;
+                    var scrollHeight = this.content.getElementRef().nativeElement.children[0].scrollHeight/2;
+
+                    if(nextOffset >= 0 && nextOffset <= CLIENTS_PER_PAGE) {
+                        this.content.scrollToTop();
+                    } else {
+                        // this only works
+                        this.content.scrollTo(0, scrollHeight, 200);
+                    }
+                    if (prevOffset < 0) {
+                        this.infiniteScroll.enableTop(false);
+                    } else {
+                        this.infiniteScroll.enableTop(true);
+                    }
+                    if (nextOffset < 0) {
+                        this.infiniteScroll.enableBottom(false);
+                    } else {
+                        this.infiniteScroll.enableBottom(true);
+                    }
                 });
             } else if (this.content && this.loading && !isFetching) {
                 this.loading.dismiss();
             }
         });
 
+
+        // order items
+        /**
+         * @todo what about ordering selected tab ?! ->
+         */
         _appStore.select(orderBySelector).subscribe((orderBy) => {
             if(orderBy.field === 'id') {
                 this.orderByPathDirection = 'default';
@@ -132,13 +163,18 @@ export class ClientSelectModalComponent {
                 this.orderByPathDirection = orderBy.direction;
             }
 
-            let clientsState = this._appStore.getState().clients;
-            let selectedIds = this.segmentView === 'selected' ? _.union(this._appStore.getState().clients.selected, this._appStore.getState().clients.applied) : [];
-            this._appStore.dispatch(this._clientActions.fetchClients(0, clientsState.orderBy, selectedIds));
-
+            // let clientsState = this._appStore.getState().clients;
+            // let selectedIds = this.segmentView === 'selected' ? _.union(this._appStore.getState().clients.selected, this._appStore.getState().clients.applied) : [];
         });
 
 
+    }
+
+
+    ionViewDidEnter() {
+        // console.log(this.content.getScrollElement());
+        // console.log("content", this.content.getElementRef());
+        // console.log("content", this.content.getElementRef().nativeElement.children[0].scrollHeight);
     }
 
     /**
@@ -158,20 +194,17 @@ export class ClientSelectModalComponent {
         // scrollContent.style.marginTop = parseInt(scrollContent.style.marginTop, 10) + ((this.showSearchForm ? 1 : -1) * searchBarHeight) + 'px';
     }
 
-    ionViewDidEnter() {
-        console.log("content", this.content.getElementRef().nativeElement.children[0].style.marginTop);
-    }
 
     doSearch(ev) {
         console.log("ev", ev);
     }
 
     changeSegment() {
-        if(this.segmentView === 'selected') {
-            let clientsState = this._appStore.getState().clients;
-            let selectedIds = _.union(this._appStore.getState().clients.selected, this._appStore.getState().clients.applied);
-            this._appStore.dispatch(this._clientActions.fetchClients(0, clientsState.orderBy, selectedIds));
-        }
+        this._appStore.dispatch(this._clientActions.resetOffset());
+        this._appStore.dispatch(this._clientActions.setOrderBy('', true));
+
+        let selectedIds = this.segmentView === 'selected' ? _.union(this._appStore.getState().clients.selected, this._appStore.getState().clients.applied) : [];
+        this._appStore.dispatch(this._clientActions.fetchClients('next', selectedIds));
     }
 
     /**
@@ -239,25 +272,16 @@ export class ClientSelectModalComponent {
 
     applySelect() {
         this._appStore.dispatch((this._clientActions.applySelectedClients()));
-
-        // if(this.segmentView === 'all') {
-        //     this._appStore.dispatch((this._clientActions.applySelectedClients()));
-        // } else {
-        //     this._appStore.dispatch((this._clientActions.applyDeselectedClients()));
-        // }
     }
 
     orderBy(field) {
-        this._appStore.dispatch(this._clientActions.setOrderBy(field));
+        this._appStore.dispatch(this._clientActions.orderClients(field, this.segmentView));
+
     }
 
     doInfinite(infiniteScroll) {
         console.log("do infinite", infiniteScroll);
-        this._appStore.dispatch(this._clientActions.fetchClients(this._appStore.getState().clients.nextOffset));
-        setTimeout(() => {
-            //this.content.scrollToTop();
-            infiniteScroll.complete();
-        }, 2000);
-
+        let direction = (infiniteScroll.arrivedAt === 'bottom') ? 'next' : 'prev';
+        this._appStore.dispatch(this._clientActions.fetchClients(direction));
     }
 }

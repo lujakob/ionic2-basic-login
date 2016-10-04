@@ -23,9 +23,15 @@ import { ClientService } from './services/client.service';
 
 // my logger middleware
 const loggerMiddleware = store => next => action => {
+    if(action.type === 'REQUEST_CLIENTS' || action.type === 'RECEIVE_CLIENTS') {
+        // console.log('dispatching', action);
+    }
     console.log('dispatching', action);
+
     return next(action);
 };
+
+export const CLIENTS_PER_PAGE = 100;
 
 const appStoreFactory = createAppStoreFactoryWithOptions({
     reducers,
