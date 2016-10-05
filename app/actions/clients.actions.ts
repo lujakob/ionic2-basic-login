@@ -176,6 +176,13 @@ export class ClientsActions extends Actions {
         };
     }
 
+    reset() {
+        return (dispatch) => {
+            dispatch(this.resetOffset());
+            dispatch(this.setOrderBy('', true));
+        };
+    }
+
     // fetchClients( offset = 0, limit = 100, orderBy = {field: 'path', direction: 'asc'}, selectedIds = []) {
     fetchClients(direction = 'next', selectedIds = []) {
         let offset = (direction === 'next' ? this._appStore.getState().clients.nextOffset : this._appStore.getState().clients.prevOffset),

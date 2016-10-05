@@ -73,6 +73,8 @@ export class ClientSelectModalComponent {
     private selectedClients;
     private loading;
 
+    private isFetchingSubscriber;
+
     public segmentView:string = 'all';
     public orderByPathDirection:string = '';
     public orderByIdDirection:string = '';
@@ -103,58 +105,10 @@ export class ClientSelectModalComponent {
         });
 
 
-        _appStore.select(state => state).subscribe((state) => {
-            console.log("state", state);
-            // console.log("prevOffset", clients.prevOffset);
-        });
-
-        // isFetching
-        _appStore.select(isFetchingSelector).skip(2).subscribe((isFetching) => {
-
-// console.log("this.content", this.content);
-//             if(this.loading !== null) {
-//                 console.log("joooo");
-//                 this.loading = null;
-//             }
-            if(this.content && isFetching) {
-
-                    this.loading = this.loadingCtrl.create({
-                        content: 'Please wait...'
-                    });
-
-                    this.loading.present();
-
-                    this.loading.onDidDismiss(() => {
-                        this.virtualScroll.update(false);
-
-
-                        this.infiniteScroll.complete();
-                        let nextOffset = this._appStore.getState().clients.nextOffset;
-                        let prevOffset = this._appStore.getState().clients.prevOffset;
-                        var scrollHeight = this.content.getElementRef().nativeElement.children[0].scrollHeight/2;
-
-                        if(nextOffset >= 0 && nextOffset <= CLIENTS_PER_PAGE) {
-                            this.content.scrollToTop();
-                        } else {
-                            // this only works
-                            this.content.scrollTo(0, scrollHeight, 200);
-                        }
-                        if (prevOffset < 0) {
-                            this.infiniteScroll.enableTop(false);
-                        } else {
-                            this.infiniteScroll.enableTop(true);
-                        }
-                        if (nextOffset < 0) {
-                            this.infiniteScroll.enableBottom(false);
-                        } else {
-                            this.infiniteScroll.enableBottom(true);
-                        }
-                    });
-
-            } else if (this.content && this.loading && !isFetching) {
-                this.loading && this.loading.dismiss();
-            }
-        });
+        // _appStore.select(state => state).subscribe((state) => {
+        //     console.log("state", state);
+        //     // console.log("prevOffset", clients.prevOffset);
+        // });
 
 
         // order items
@@ -179,13 +133,58 @@ export class ClientSelectModalComponent {
 
 
     ionViewDidEnter() {
+        // isFetching
+        this.isFetchingSubscriber = this._appStore.select(isFetchingSelector).skip(2).subscribe((isFetching) => {
+
+            if(this.content && isFetching) {
+
+                this.loading = this.loadingCtrl.create({
+                    content: 'Please wait...'
+                });
+
+                this.loading.present();
+
+                this.loading.onDidDismiss(() => {
+                    this.virtualScroll.update(false);
+
+
+                    this.infiniteScroll.complete();
+                    let nextOffset = this._appStore.getState().clients.nextOffset;
+                    let prevOffset = this._appStore.getState().clients.prevOffset;
+                    var scrollHeight = this.content.getElementRef().nativeElement.children[0].scrollHeight/2;
+
+                    if(nextOffset >= 0 && nextOffset <= CLIENTS_PER_PAGE) {
+                        this.content.scrollToTop();
+                    } else {
+                        // this only works
+                        this.content.scrollTo(0, scrollHeight, 200);
+                    }
+                    if (prevOffset < 0) {
+                        this.infiniteScroll.enableTop(false);
+                    } else {
+                        this.infiniteScroll.enableTop(true);
+                    }
+                    if (nextOffset < 0) {
+                        this.infiniteScroll.enableBottom(false);
+                    } else {
+                        this.infiniteScroll.enableBottom(true);
+                    }
+                });
+
+            } else if (this.content && this.loading && !isFetching) {
+                this.loading && this.loading.dismiss();
+            }
+        });
+
         // console.log(this.content.getScrollElement());
         // console.log("content", this.content.getElementRef());
         // console.log("content", this.content.getElementRef().nativeElement.children[0].scrollHeight);
     }
 
-    ionViewWillLeave() {
-        //console.log("div leave", this.loading);
+    ionViewDidLeave() {
+
+        this._appStore.dispatch(this._clientActions.reset());
+        this.isFetchingSubscriber.unsubscribe();
     }
 
     /**
