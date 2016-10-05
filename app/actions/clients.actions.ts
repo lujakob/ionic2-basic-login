@@ -186,7 +186,7 @@ export class ClientsActions extends Actions {
             if (offset < 0) {
                 return false;
             }
-            let path = '/?1=1&sortColumn=' + orderBy.field + '&isAsc=' + (orderBy.direction === 'asc' ? 'true' : 'false') + (offset > 0 ? '&start=' + offset : '') + (limit > 0 ? '&count=' + limit : '');
+            let path = '?1=1&sortColumn=' + orderBy.field + '&isAsc=' + (orderBy.direction === 'asc' ? 'true' : 'false') + (offset > 0 ? '&start=' + offset : '') + (limit > 0 ? '&count=' + limit : '');
 
             dispatch(this.requestClients());
 

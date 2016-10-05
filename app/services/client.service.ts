@@ -1,7 +1,7 @@
 import { Injectable }     from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Http, Headers } from '@angular/http';
 import { Observable }     from 'rxjs/Observable';
-import { REST_ENDPOINT } from '../config/config';
+import { REST_ENDPOINT, TEST_USER_NAME, TEST_USER_PASSWORD } from '../config/config';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
@@ -19,23 +19,22 @@ export class ClientService {
     constructor (private _http: Http) {}
 
     /**
-    *
-    * @param path
-    * @returns {Observable<R>}
-    */
+     *
+     * @param path
+     * @returns {Observable<R>}
+     */
     getClients(path:string = '', clientIds = []):Observable<IAPIClients> {
         return this._http.post(BASE_URL + path, {clientIds: clientIds})
           .map<IAPIClients>(res => res.json());
     }
 
-
     //
     // createAuthorizationHeader(headers:Headers) {
-    //     let username = "user";
-    //     let password = "password";
-    //
-    //     headers.append('Authorization', 'Basic ' +
-    //         btoa(username + ':' + password));
+    //     let username = TEST_USER_NAME;
+    //     let password = TEST_USER_PASSWORD;
+    //     headers.append('Authorization', 'Basic ' + btoa(username + ':' + password));
+    //     console.log('Basic ' + btoa(username + ':' + password));
+    //     console.log(headers);
     // }
     //
     // /**
@@ -43,16 +42,14 @@ export class ClientService {
     //  * @param path
     //  * @returns {Observable<R>}
     //  */
-    // getClients(path:string = ''):Observable<IAPIClients> {
+    // getClients(path:string = '', clientIds = []):Observable<IAPIClients> {
     //
     //     let headers = new Headers();
     //     this.createAuthorizationHeader(headers);
     //
-    //     return this._http.get(BASE_URL + '?count=500', {
-    //         headers: headers
-    //     }).map<IAPIClients>(res => {
-    //         return res.json();
-    //     });
+    //     return this._http.post(BASE_URL + path, {clientIds: clientIds})
+    //         .map<IAPIClients>(res => res.json());
     // }
+
 
 }
