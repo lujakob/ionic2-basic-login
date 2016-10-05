@@ -1,11 +1,11 @@
-import {Component, ViewChild, PLATFORM_DIRECTIVES} from '@angular/core';
+import { Component, ViewChild, PLATFORM_DIRECTIVES } from '@angular/core';
 import { Http } from '@angular/http';
 import { ionicBootstrap, Platform, MenuController, Nav } from 'ionic-angular';
 import { StatusBar } from 'ionic-native';
 import { ProfilePage } from './pages/profile/profile';
 
 import { TabsPage } from './pages/tabs/tabs';
-import { AuthHttp, AuthConfig } from 'angular2-jwt';
+import { AuthHttp, AuthConfig, JwtHelper } from 'angular2-jwt';
 import { ClientListButton } from './components/client-list-button.component';
 import { ClientSelectButton } from './components/client-select-button.component';
 import { BmgInfiniteScrollContent } from './components/bmg-infinite-scroll-content.component';
@@ -16,6 +16,7 @@ import { FilmActions } from './actions/film.actions';
 import { CounterActions } from './actions/counter.actions';
 import { ContentActions } from './actions/content.actions';
 import { ClientsActions } from './actions/clients.actions';
+import { UserActions } from './actions/user.actions';
 
 import { AuthService } from './services/auth/auth';
 import { ContentService } from './services/content.service';
@@ -51,7 +52,9 @@ export class MyApp {
     constructor(
         public platform: Platform,
         public menu: MenuController,
-        public service: AuthService
+        public service: AuthService,
+        private appStore: AppStore,
+        private userActions: UserActions
     ) {
 
         this.initializeAuthGuard();
@@ -69,6 +72,9 @@ export class MyApp {
     initializeAuthGuard() {
         if (this.service.authenticated()) {
             this.rootPage = TabsPage;
+            let userData = this.service.getUserData();
+            userData && this.appStore.dispatch(this.userActions.setUserData(userData));
+
         } else {
             this.rootPage = ProfilePage;
         }
@@ -85,14 +91,15 @@ ionicBootstrap(MyApp, [
     AuthService,
     ContentService,
     ClientService,
-    FilmActions,  CounterActions, ClientsActions, ContentActions,
-    {provide: AppStore, useFactory: appStoreFactory },
-    {provide: AuthHttp,
+    JwtHelper,
+    FilmActions,  CounterActions, ClientsActions, ContentActions, UserActions,
+    { provide: AppStore, useFactory: appStoreFactory },
+    { provide: AuthHttp,
         useFactory: (http) => {
             return new AuthHttp(new AuthConfig, http);
         },
         deps: [Http]
     },
-    {provide: PLATFORM_DIRECTIVES, useValue: [ClientListButton, ClientSelectButton, BmgInfiniteScrollContent], multi: true}
+    { provide: PLATFORM_DIRECTIVES, useValue: [ClientListButton, ClientSelectButton, BmgInfiniteScrollContent], multi: true }
 ]);
 

@@ -11,23 +11,18 @@ import { ClientSelectModalComponent } from './client-select-modal.component';
   providers: []
 })
 export class ClientSelectButton {
-  private client: number = 0;
-  constructor(
-    public modalCtrl: ModalController,
-    private _appStore: AppStore,
-    private _selectClientsActions: ClientsActions,
-    private _contentActions: ContentActions) {
+    private client: number = 0;
+
+    constructor(
+        public modalCtrl: ModalController,
+        private _appStore: AppStore,
+        private _selectClientsActions: ClientsActions,
+        private _contentActions: ContentActions) {}
 
 
-  }
-
-  // ionViewDidEnter() {
-  //   this.openModal();
-  // }
-
-  openModal() {
-    let modal = this.modalCtrl.create(ClientSelectModalComponent);
-    modal.present();
-  }
+    openModal() {
+        let modal = this.modalCtrl.create(ClientSelectModalComponent);
+        modal.present();
+    }
 
 }

@@ -4,6 +4,7 @@ import { AppStore } from "angular2-redux";
 import { CounterActions } from "../../actions/counter.actions";
 import { counterSelector } from "../../reducers/counter.reducer";
 import { selectedClientsSelector } from "../../reducers/clients.reducer";
+import { usernameSelector } from "../../reducers/user.reducer";
 
 @Component({
     //changeDetection:ChangeDetectionStrategy.OnPush,
@@ -11,6 +12,7 @@ import { selectedClientsSelector } from "../../reducers/clients.reducer";
 })
 export class HomePage {
     public clientId: number = 0;
+    public username: string = '';
     private counter;
     private increment;
     private decrement;
@@ -30,6 +32,12 @@ export class HomePage {
             console.log("selectedClientSelector", selectedClient);
             this.clientId = selectedClient;
         });
+
+        _appStore.select(usernameSelector).subscribe(username => {
+            console.log("username", username);
+            this.username = username;
+        });
+
     //
     //   _appStore.subscribe((state) => {
     //       console.log("state", state);

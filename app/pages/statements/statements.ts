@@ -47,7 +47,7 @@ export class StatementsPage {
 
     ionViewLoaded() {
         setTimeout(() => {
-        this.clientSelectButton.openModal();
+        // this.clientSelectButton.openModal();
         }, 500);
     }
 
