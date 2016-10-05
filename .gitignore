@@ -11,3 +11,4 @@ Thumbs.db
 .idea
 backend/data/
 hooks/
+app/config/config.ts
