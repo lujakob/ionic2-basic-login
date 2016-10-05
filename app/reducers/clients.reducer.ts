@@ -1,6 +1,5 @@
 import { ClientsActionTypes, ClientsAction } from '../actions/clients.actions';
-import { CLIENTS_PER_PAGE } from '../app';
-import * as _ from 'lodash';
+import { CLIENTS_PER_PAGE } from '../config/config';
 
 export const initialState = {
     isFetching: false,

@@ -116,8 +116,8 @@ var functions = {
     },
 
     getClients: function(req, res) {
-        var limit = 100,
-            offset = 0,
+        var count = 100,
+            start = 0,
             defaultSortby = 'path',
             sortDirection = 'asc',
             nextOffset,
@@ -161,25 +161,25 @@ var functions = {
         data = _.orderBy(data, [sortColumn], [sortDirection]);
 
         if(data.length >= 300) {
-            data = _.take(data, 300);
+            // data = _.take(data, 300);
         }
         total = data.length;
 
-        // offset
-        if (params.offset && parseInt(params.offset) > 0) {
-            offset = parseInt(params.offset);
+        // start
+        if (params.start && parseInt(params.start) > 0) {
+            start = parseInt(params.start);
         }
 
-        // limit
-        if (params.limit && parseInt(params.limit) > 0) {
-            limit = parseInt(params.limit);
+        // count
+        if (params.count && parseInt(params.count) > 0) {
+            count = parseInt(params.count);
         }
 
-        nextOffset = data.length > limit + offset ? limit + offset : -1;
+        nextOffset = data.length > count + start ? count + start : -1;
 
 
-        if(limit > 0) {
-            data = data.slice(offset, (data.length > (offset + limit) ? offset + limit : data.length));
+        if(count > 0) {
+            data = data.slice(start, (data.length > (start + count) ? start + count : data.length));
         }
 
         // for (var i = 0, len = data.length; i < len; i++) {

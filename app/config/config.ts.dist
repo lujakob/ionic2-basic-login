@@ -1,0 +1,2 @@
+export const CLIENTS_PER_PAGE = 100;
+export const REST_ENDPOINT = 'https://url-to-rest-endpoint/api/';

@@ -7,7 +7,7 @@ import { ClientsActions }from '../actions/clients.actions';
 import { BmgInfiniteScroll } from './bmg-infinite-scroll.component';
 import * as _ from 'lodash';
 import 'rxjs/add/operator/skip';
-import {CLIENTS_PER_PAGE} from "../app";
+import { CLIENTS_PER_PAGE } from "../config/config";
 
 @Component({
     template: `

@@ -31,8 +31,6 @@ const loggerMiddleware = store => next => action => {
     return next(action);
 };
 
-export const CLIENTS_PER_PAGE = 100;
-
 const appStoreFactory = createAppStoreFactoryWithOptions({
     reducers,
     additionalMiddlewares: [loggerMiddleware],

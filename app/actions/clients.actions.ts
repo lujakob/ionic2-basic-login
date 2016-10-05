@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Actions, AppStore } from 'angular2-redux';
 import { ClientService } from '../services/client.service';
-import { CLIENTS_PER_PAGE } from '../app';
+import { CLIENTS_PER_PAGE } from '../config/config';
 import * as _ from 'lodash';
 
 type Types = 'SELECT_CLIENT | REQUEST_CLIENTS | RECEIVE_CLIENTS | RECEIVE_SELECTED_CLIENTS | RESET_OFFSET | UPDATE_CLIENT | UPDATE_CLIENT_STATE | APPLY_SELECTED_CLIENTS | APPLY_DESELECTED_CLIENTS | SELECT_ALL_CLIENTS | DESELECT_ALL_CLIENTS';
@@ -186,7 +186,7 @@ export class ClientsActions extends Actions {
             if (offset < 0) {
                 return false;
             }
-            let path = '/?1=1&sortColumn=' + orderBy.field + '&isAsc=' + (orderBy.direction === 'asc' ? 'true' : 'false') + (offset > 0 ? '&offset=' + offset : '') + (limit > 0 ? '&limit=' + limit : '');
+            let path = '/?1=1&sortColumn=' + orderBy.field + '&isAsc=' + (orderBy.direction === 'asc' ? 'true' : 'false') + (offset > 0 ? '&start=' + offset : '') + (limit > 0 ? '&count=' + limit : '');
 
             dispatch(this.requestClients());
 
