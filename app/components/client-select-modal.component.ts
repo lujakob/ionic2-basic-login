@@ -33,7 +33,7 @@ import { CLIENTS_PER_PAGE } from "../config/config";
     <ion-searchbar #searchBar class="ion-searchbar" (ionInput)="doSearch($event)" [class.show-form]="showSearchForm"></ion-searchbar>
     <button clear (click)="orderBy('id')" class="btn-order-by-id btn-order-by" [ngClass]="setOrderByClasses('id')">Id</button>
     <button clear (click)="orderBy('path')" class="btn-order-by-path btn-order-by" [ngClass]="setOrderByClasses('path')">Name</button>
-    <button clear (click)="selectAll()" class="btn-select-all">Select all</button>
+    <button *ngIf="showSelectAllBtn" clear (click)="selectAll()" class="btn-select-all">Select all</button>
 </div>
 </ion-header>
 
@@ -72,6 +72,7 @@ export class ClientSelectModalComponent {
     private allClients;
     private selectedClients;
     private loading;
+    private showSelectAllBtn: boolean = false;
 
     private isFetchingSubscriber;
 
@@ -93,6 +94,7 @@ export class ClientSelectModalComponent {
                 private loadingCtrl: LoadingController,
                 private _clientActions:ClientsActions) {
 
+        this.showSelectAllBtn = !_appStore.getState().user.allClients;
 
         // this.selectedClients$ = _appStore.select(selectedClientsSelector);
 

@@ -1,6 +1,6 @@
 import { UserActionTypes, UserActionsInterface } from '../actions/user.actions';
 
-export const initialState = { username: '', singleClient: true, allClients:false };
+export const initialState = { username: '', singleClient: false, allClients:true };
 
 export const user = (state:any = initialState, action: UserActionsInterface = {type:"?"}) => {
     switch (action.type) {
